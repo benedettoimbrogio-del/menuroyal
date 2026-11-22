@@ -509,7 +509,9 @@ footer.foot .note {
   .door, .reveal, .modal, .modal-backdrop { transition: none; }
 }
 
-  </style>
+  .day.is-target { animation: royalPulse 1s ease-in-out 4; }
+@keyframes royalPulse { 0%,100% { filter: none; } 50% { filter: drop-shadow(0 0 14px rgba(242,194,48,.95)); } }
+</style>
 </head>
 <body>
   <div class="page">
@@ -813,6 +815,7 @@ footer.foot .note {
         btn.type = "button";
         btn.className = "day";
         btn.setAttribute("data-day", String(day));
+        btn.id = "giorno-" + day;
         btn.setAttribute("aria-label", "Giorno " + day + ", " + dateLabel(day));
         btn.setAttribute("aria-pressed", "false");
         var inner = document.createElement("span");
@@ -880,6 +883,21 @@ footer.foot .note {
   buildTree();
   restore();
   updateHint();
+
+  function handleHash() {
+    var m = /^#giorno-(\d{1,2})$/.exec(window.location.hash || "");
+    if (!m) return;
+    var day = +m[1];
+    if (day < 1 || day > 25) return;
+    var btn = document.getElementById("giorno-" + day);
+    if (!btn) return;
+    try { btn.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) { btn.scrollIntoView(); }
+    btn.classList.add("is-target");
+    window.setTimeout(function () { btn.classList.remove("is-target"); }, 4000);
+    window.setTimeout(function () { onDayClick(day, btn); }, 600);
+  }
+  window.addEventListener("hashchange", handleHash);
+  handleHash();
 })();
 
   </script>

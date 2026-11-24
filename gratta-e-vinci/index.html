@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#12070a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Gratta e Vinci Royal">
+  <title>Gratta e Vinci · Royal Randazzo</title>
+  <link rel="icon" href="assets/logo_royal.png">
+  <style>
+    @font-face {
+      font-family: "Cinzel Decorative";
+      src: url("fonts/CinzelDecorative-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Cinzel Decorative";
+      src: url("fonts/CinzelDecorative-Bold.woff2") format("woff2");
+      font-weight: 700;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Cinzel";
+      src: url("fonts/Cinzel.woff2") format("woff2");
+      font-weight: 400 900;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "EB Garamond";
+      src: url("fonts/EBGaramond.woff2") format("woff2");
+      font-weight: 400 700;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "EB Garamond";
+      src: url("fonts/EBGaramond-Italic.woff2") format("woff2");
+      font-weight: 400 700;
+      font-style: italic;
+      font-display: swap;
+    }
+
+    :root {
+      --bg: #12070a;
+      --bg-2: #1c0b10;
+      --burgundy: #6b1220;
+      --burgundy-2: #8e1c2e;
+      --gold: #d4af37;
+      --gold-2: #f0d78c;
+      --cream: #f6e7c8;
+      --cream-dim: #cbb98a;
+      --card: #18090d;
+      --ink: #2a1014;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    html { background: var(--bg); }
+    body {
+      font-family: "EB Garamond", "Palatino Linotype", Palatino, Georgia, serif;
+      color: var(--cream);
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(142, 28, 46, 0.35), transparent 60%),
+        radial-gradient(ellipse 70% 40% at 50% 100%, rgba(212, 175, 55, 0.08), transparent 60%),
+        var(--bg);
+      min-height: 100%;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+
+    .wrap {
+      width: min(430px, 100%);
+      margin: 0 auto;
+      padding: 20px 18px 32px;
+      min-height: 100%;
+    }
+
+    .proto-badge {
+      display: inline-block;
+      font-family: Cinzel, serif;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      padding: 3px 8px;
+      border-radius: 999px;
+      margin: 0 auto 12px;
+    }
+    .header { text-align: center; }
+    .logo {
+      width: 92px;
+      height: auto;
+      display: block;
+      margin: 0 auto 8px;
+      filter: drop-shadow(0 6px 16px rgba(0,0,0,.5));
+    }
+    body.is-revealed .logo { width: 64px; }
+    .locale {
+      font-family: "Cinzel Decorative", Cinzel, serif;
+      font-size: 34px;
+      letter-spacing: 0.06em;
+      color: var(--gold-2);
+      line-height: 1;
+      text-shadow: 0 2px 0 #3a0c14, 0 0 24px rgba(212, 175, 55, 0.25);
+    }
+    .tagline {
+      margin-top: 6px;
+      font-family: Cinzel, serif;
+      font-size: 10.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+    }
+    .rule {
+      width: 140px;
+      height: 1px;
+      margin: 16px auto;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    h1 {
+      font-family: "Cinzel Decorative", Cinzel, serif;
+      font-weight: 400;
+      font-size: 26px;
+      letter-spacing: 0.04em;
+      color: var(--cream);
+    }
+    .subtitle {
+      margin-top: 4px;
+      font-style: italic;
+      color: var(--cream-dim);
+      font-size: 17px;
+    }
+
+    .hint {
+      text-align: center;
+      margin: 14px 0 10px;
+      color: var(--cream-dim);
+      font-size: 16px;
+    }
+    body.is-revealed .hint { display: none; }
+    body.is-revealed .scratch-block { display: none; }
+    body.is-scratching-phase .result-block { display: none; }
+
+    .ticket {
+      position: relative;
+      margin: 0 auto;
+      width: 100%;
+      aspect-ratio: 5 / 4;
+      background: var(--card);
+      border: 1.5px solid var(--gold);
+      border-radius: 14px;
+      box-shadow:
+        0 0 0 4px rgba(18, 7, 10, 1),
+        0 0 0 5px rgba(212, 175, 55, 0.45),
+        0 18px 40px rgba(0,0,0,.45);
+      overflow: hidden;
+    }
+    .ticket::before {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 9px;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .prize-under {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 24px 16px;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at 50% 40%, rgba(142, 28, 46, 0.45), transparent 65%),
+        linear-gradient(180deg, #241015, #12070a);
+    }
+    .prize-under .ico {
+      width: 52px;
+      height: 52px;
+      color: var(--gold);
+    }
+    .prize-under .ico svg { width: 100%; height: 100%; fill: none; stroke: currentColor; }
+    .prize-under .kicker {
+      font-family: Cinzel, serif;
+      font-size: 11px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .prize-under .pname {
+      font-family: "Cinzel Decorative", Cinzel, serif;
+      font-size: 26px;
+      line-height: 1.15;
+      color: var(--gold-2);
+      padding: 0 8px;
+    }
+    .prize-under .pdesc {
+      font-size: 15px;
+      color: var(--cream-dim);
+      max-width: 260px;
+    }
+    #scratch {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      touch-action: none;
+      cursor: grab;
+      border-radius: 14px;
+    }
+    #scratch:active { cursor: grabbing; }
+    .shine {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.28) 50%, transparent 70%);
+      background-size: 220% 100%;
+      animation: shine 2.8s ease-in-out infinite;
+      mix-blend-mode: soft-light;
+      border-radius: 14px;
+    }
+    body.is-scratch-started .shine,
+    body.is-revealed .shine { display: none; }
+    @keyframes shine {
+      0% { background-position: 120% 0; }
+      100% { background-position: -120% 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .shine { animation: none; display: none; }
+    }
+
+    .result-block { margin-top: 18px; text-align: center; }
+    .result-kicker {
+      font-family: Cinzel, serif;
+      font-size: 12px;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    body.is-jackpot .result-kicker {
+      color: var(--gold-2);
+      text-shadow: 0 0 16px rgba(240, 215, 140, 0.5);
+    }
+    .result-title {
+      font-family: "Cinzel Decorative", Cinzel, serif;
+      font-size: 30px;
+      line-height: 1.15;
+      color: var(--gold-2);
+      margin-bottom: 6px;
+    }
+    .result-desc {
+      font-size: 17px;
+      color: var(--cream);
+      margin-bottom: 16px;
+    }
+    .result-ico {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 8px;
+      color: var(--gold);
+    }
+    .result-ico svg { width: 100%; height: 100%; fill: none; stroke: currentColor; }
+
+    .code-box {
+      background: linear-gradient(180deg, rgba(142, 28, 46, 0.35), rgba(18, 7, 10, 0.6));
+      border: 1px solid var(--gold);
+      border-radius: 12px;
+      padding: 14px 12px 16px;
+      margin: 12px 0;
+    }
+    .code-label {
+      font-family: Cinzel, serif;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+      margin-bottom: 6px;
+    }
+    .code-value {
+      font-family: "Cinzel", ui-monospace, monospace;
+      font-size: 22px;
+      letter-spacing: 0.08em;
+      color: var(--gold-2);
+      word-break: break-word;
+    }
+    .code-meta {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--cream-dim);
+    }
+
+    .redeem {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      font-size: 16px;
+      line-height: 1.4;
+    }
+    .validity {
+      margin-top: 10px;
+      font-style: italic;
+      color: var(--cream-dim);
+      font-size: 15px;
+    }
+
+    footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--cream-dim);
+      line-height: 1.5;
+    }
+    footer .loc {
+      font-family: Cinzel, serif;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 10px;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+
+    /* Demo */
+    body.is-demo .scratch-block,
+    body.is-demo .hint,
+    body.is-demo .result-block { display: none !important; }
+    .demo {
+      display: none;
+      margin-top: 8px;
+    }
+    body.is-demo .demo { display: block; }
+    .demo h2 {
+      font-family: Cinzel, serif;
+      font-size: 18px;
+      font-weight: 500;
+      text-align: center;
+      margin: 8px 0 14px;
+      color: var(--gold-2);
+    }
+    .demo .totals {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .demo .tot {
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 10px;
+      padding: 10px 8px;
+      text-align: center;
+    }
+    .demo .tot b {
+      display: block;
+      font-family: Cinzel, serif;
+      font-size: 22px;
+      color: var(--gold-2);
+    }
+    .demo .tot span { font-size: 12px; color: var(--cream-dim); }
+    table.demo-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    table.demo-table th, table.demo-table td {
+      padding: 7px 6px;
+      text-align: left;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+    table.demo-table th {
+      font-family: Cinzel, serif;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+    }
+    table.demo-table td.num, table.demo-table th.num { text-align: right; }
+    table.demo-table tr.is-jackpot td { color: var(--gold-2); }
+    table.demo-table tr.is-zero td { opacity: 0.45; }
+    .bar {
+      display: block;
+      height: 6px;
+      background: rgba(255,255,255,.08);
+      border-radius: 99px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    .bar i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--burgundy-2), var(--gold));
+      border-radius: 99px;
+    }
+    .demo-actions {
+      text-align: center;
+      margin: 16px 0 8px;
+    }
+    .btn {
+      font-family: Cinzel, serif;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+      background: linear-gradient(180deg, var(--gold-2), var(--gold));
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 18px;
+      cursor: pointer;
+    }
+    .demo-note {
+      font-size: 12.5px;
+      color: var(--cream-dim);
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    #confetti {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 20;
+    }
+    body.is-nowin .result-title { color: var(--cream); }
+    body.is-nowin .result-kicker { color: var(--cream-dim); }
+
+    noscript {
+      display: block;
+      padding: 24px;
+      text-align: center;
+      color: var(--cream);
+    }
+  </style>
+</head>
+<body class="is-scratching-phase">
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <header class="header">
+      <div class="proto-badge">Prototipo dimostrativo</div>
+      <img class="logo" id="logo" alt="Royal Randazzo" src="assets/logo_royal.png">
+      <div class="locale" id="localeName">Royal Randazzo</div>
+      <div class="tagline" id="tagline">Ristorante · Pizzeria · Randazzo</div>
+      <div class="rule"></div>
+      <h1 id="pageTitle">Gratta e Vinci</h1>
+      <p class="subtitle" id="subtitle">Un biglietto con ogni pizza</p>
+    </header>
+
+    <p class="hint" id="hint">Gratta con il dito (o il mouse) per scoprire il premio.</p>
+
+    <div class="scratch-block">
+      <div class="ticket" id="ticket">
+        <div class="prize-under" id="prizeUnder"></div>
+        <canvas id="scratch" width="640" height="512"></canvas>
+        <div class="shine" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <section class="result-block" id="resultBlock" hidden>
+      <div class="result-ico" id="resultIco"></div>
+      <div class="result-kicker" id="resultKicker">Hai vinto</div>
+      <h2 class="result-title" id="resultTitle"></h2>
+      <p class="result-desc" id="resultDesc"></p>
+      <div class="code-box">
+        <div class="code-label">Codice premio</div>
+        <div class="code-value" id="resultCode"></div>
+        <div class="code-meta" id="resultMeta"></div>
+      </div>
+      <div class="redeem" id="redeemText"></div>
+      <p class="validity" id="validityText"></p>
+    </section>
+
+    <section class="demo" id="demoSection">
+      <h2>Simulazione di 1000 estrazioni</h2>
+      <div class="totals" id="demoTotals"></div>
+      <table class="demo-table" id="demoTable">
+        <thead>
+          <tr>
+            <th>Premio</th>
+            <th class="num">Peso</th>
+            <th class="num">Atteso</th>
+            <th class="num">Ottenuto</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="demo-actions">
+        <button class="btn" type="button" id="demoRerun">Rilancia 1000 estrazioni</button>
+      </div>
+      <p class="demo-note">Questa pagina serve solo a verificare le probabilità. I clienti devono aprire il biglietto senza <code>?demo=1</code>.</p>
+    </section>
+
+    <footer>
+      <div class="loc" id="footerLoc">Royal · Ristorante · Pizzeria · Randazzo (CT)</div>
+      <p>Iniziativa promozionale del locale. Non è un gioco d’azzardo e non è collegata al Gratta e Vinci dello Stato.</p>
+      <p>I premi di questo prototipo sono estratti sul dispositivo: per l’uso reale serve un sistema in cassa che valida i codici.</p>
+    </footer>
+  </div>
+
+  <noscript>Per usare il Gratta e Vinci devi attivare JavaScript.</noscript>
+
+  <script>
+    window.CONFIG_DEFAULT = {
+      localeName: "Royal Randazzo",
+      tagline: "Ristorante · Pizzeria · Randazzo",
+      title: "Gratta e Vinci",
+      subtitle: "Un biglietto con ogni pizza",
+      logoUrl: "assets/logo_royal.png",
+      codePrefix: "RYL",
+      colors: {
+        background: "#12070a",
+        backgroundAlt: "#1c0b10",
+        burgundy: "#6b1220",
+        burgundyLight: "#8e1c2e",
+        gold: "#d4af37",
+        goldSoft: "#f0d78c",
+        cream: "#f6e7c8",
+        creamDim: "#cbb98a",
+        card: "#18090d"
+      },
+      scratchThreshold: 0.55,
+      validityText: "Valido sul prossimo ordine entro 30 giorni.",
+      redeemText: "Mostra questa schermata alla cassa, oppure fai uno screenshot.",
+      prizes: [
+        { id: "sconto", label: "Sconto 10%", description: "Sconto del 10% sul prossimo ordine.", weight: 12, isJackpot: false },
+        { id: "bibita", label: "Bibita omaggio", description: "Una bibita omaggio sul prossimo ordine.", weight: 11, isJackpot: false },
+        { id: "arancinetti", label: "Arancinetti omaggio", description: "Arancinetti omaggio sul prossimo ordine.", weight: 11, isJackpot: false },
+        { id: "spirale", label: "Spirale di patate", description: "Spirale di patate omaggio sul prossimo ordine.", weight: 11, isJackpot: false },
+        { id: "petali", label: "Petali di patate", description: "Petali di patate omaggio sul prossimo ordine.", weight: 10, isJackpot: false },
+        { id: "crocchette", label: "Crocchette di patate", description: "Crocchette di patate omaggio sul prossimo ordine.", weight: 10, isJackpot: false },
+        { id: "bocconcini", label: "Bocconcini di pollo", description: "Bocconcini di pollo omaggio sul prossimo ordine.", weight: 10, isJackpot: false },
+        { id: "pizza", label: "Pizza gratis", description: "Una pizza omaggio a scelta dal menù.", weight: 15, isJackpot: true },
+        { id: "cena", label: "Cena per due", description: "Cena per due persone: due pizze e due bibite.", weight: 10, isJackpot: true },
+        { id: "ritenta", label: "Ritenta", description: "Nessun premio questa volta. Ritenta con la prossima pizza!", weight: 0, isJackpot: false }
+      ]
+    };
+  </script>
+  <script src="config.js"></script>
+  <script>
+  (function () {
+    "use strict";
+
+    var CONFIG = window.CONFIG || window.CONFIG_DEFAULT;
+    var ALPH = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    var params = new URLSearchParams(location.search);
+    var pizzaRef = (params.get("pizza") || "").trim();
+    var tokenRef = (params.get("t") || "").trim();
+    var forceId = (params.get("force") || "").trim();
+    var isDemo = params.get("demo") === "1";
+    var wantReset = params.get("reset") === "1";
+
+    var ICONS = {
+      sconto: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="22" cy="22" r="8"/><circle cx="42" cy="42" r="8"/><path d="M18 46 L46 18"/></svg>',
+      bibita: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 h20 l-3 44a8 8 0 0 1-8 0 L22 10z"/><path d="M24 22 h16"/><path d="M40 10 c6 4 8 10 4 16"/></svg>',
+      arancinetti: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="32" cy="34" rx="16" ry="15"/><path d="M22 28 c4-10 16-10 20 0"/><circle cx="32" cy="34" r="3"/></svg>',
+      spirale: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M32 12 c14 0 20 10 20 20 0 16-12 22-20 22 s-18-8-18-20 8-16 16-16 12 6 12 12-4 8-8 8-6-3-6-6"/></svg>',
+      petali: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="32" cy="20" rx="8" ry="12" transform="rotate(-10 32 20)"/><ellipse cx="44" cy="30" rx="8" ry="12" transform="rotate(40 44 30)"/><ellipse cx="20" cy="30" rx="8" ry="12" transform="rotate(-40 20 30)"/><ellipse cx="38" cy="44" rx="8" ry="12" transform="rotate(15 38 44)"/><ellipse cx="26" cy="44" rx="8" ry="12" transform="rotate(-15 26 44)"/></svg>',
+      crocchette: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="24" width="36" height="18" rx="9"/><path d="M22 30 h20 M22 36 h14"/></svg>',
+      bocconcini: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="22" cy="28" r="8"/><circle cx="40" cy="24" r="7"/><circle cx="34" cy="40" r="9"/></svg>',
+      pizza: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M32 10 L54 50 H10 Z"/><path d="M16 38 Q32 28 48 38"/><circle cx="32" cy="30" r="2.5"/><circle cx="26" cy="38" r="2"/><circle cx="40" cy="36" r="2"/></svg>',
+      cena: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 26 l6-10 6 8 4-12 4 12 6-8 6 10"/><path d="M16 26 h32 v4 a16 16 0 0 1-32 0z"/></svg>',
+      ritenta: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 28 a12 12 0 1 1 2 16"/><path d="M20 40 v-8 h8"/></svg>'
+    };
+
+    function applyColors(c) {
+      if (!c) return;
+      var map = {
+        background: "--bg",
+        backgroundAlt: "--bg-2",
+        burgundy: "--burgundy",
+        burgundyLight: "--burgundy-2",
+        gold: "--gold",
+        goldSoft: "--gold-2",
+        cream: "--cream",
+        creamDim: "--cream-dim",
+        card: "--card"
+      };
+      Object.keys(map).forEach(function (k) {
+        if (c[k]) document.documentElement.style.setProperty(map[k], c[k]);
+      });
+      if (c.background) document.querySelector('meta[name="theme-color"]').setAttribute("content", c.background);
+    }
+
+    function rand01() {
+      var buf = new Uint32Array(1);
+      crypto.getRandomValues(buf);
+      return buf[0] / 4294967296;
+    }
+
+    function randomChar() {
+      var buf = new Uint32Array(1);
+      crypto.getRandomValues(buf);
+      return ALPH[buf[0] % ALPH.length];
+    }
+
+    function checksum(chars) {
+      var s = 0;
+      for (var i = 0; i < chars.length; i++) {
+        s += (ALPH.indexOf(chars[i]) + 1) * (i + 3);
+      }
+      return ALPH[s % ALPH.length];
+    }
+
+    function makeCode(prefix) {
+      var body = "";
+      for (var i = 0; i < 7; i++) body += randomChar();
+      var raw = body + checksum(body);
+      return (prefix || "RYL") + "-" + raw.slice(0, 4) + "-" + raw.slice(4);
+    }
+
+    function formatCodeDisplay(code) {
+      var extra = [];
+      if (pizzaRef) extra.push("PIZZA " + pizzaRef);
+      if (tokenRef) extra.push("T-" + tokenRef);
+      return extra.length ? code + " · " + extra.join(" · ") : code;
+    }
+
+    function prizeIndex() {
+      var map = {};
+      (CONFIG.prizes || []).forEach(function (p) { map[p.id] = p; });
+      return map;
+    }
+
+    function totalWeight(list) {
+      return list.reduce(function (s, p) { return s + (Number(p.weight) || 0); }, 0);
+    }
+
+    function drawPrize(prizes, rng) {
+      var enabled = (prizes || []).filter(function (p) { return (Number(p.weight) || 0) > 0; });
+      var tot = totalWeight(enabled);
+      if (!tot) return prizes[0];
+      var r = (rng || rand01)() * tot;
+      for (var i = 0; i < enabled.length; i++) {
+        r -= Number(enabled[i].weight);
+        if (r < 0) return enabled[i];
+      }
+      return enabled[enabled.length - 1];
+    }
+
+    function formatWhen(iso) {
+      var d = iso ? new Date(iso) : new Date();
+      return new Intl.DateTimeFormat("it-IT", {
+        timeZone: "Europe/Rome",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(d);
+    }
+
+    function storageKey() {
+      if (pizzaRef) return "royal_gev_v1_pizza_" + pizzaRef;
+      if (tokenRef) return "royal_gev_v1_t_" + tokenRef;
+      return "royal_gev_v1_default";
+    }
+
+    function loadState() {
+      try {
+        var raw = localStorage.getItem(storageKey());
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function saveState(state) {
+      try { localStorage.setItem(storageKey(), JSON.stringify(state)); }
+      catch (e) { /* private mode */ }
+    }
+
+    function clearState() {
+      try { localStorage.removeItem(storageKey()); }
+      catch (e) {}
+    }
+
+    function iconSvg(id) { return ICONS[id] || ICONS.sconto; }
+
+    function isNoWin(prize) { return prize && prize.id === "ritenta"; }
+
+    /* ---------- UI branding ---------- */
+    applyColors(CONFIG.colors);
+    document.getElementById("localeName").textContent = CONFIG.localeName || "Royal Randazzo";
+    document.getElementById("tagline").textContent = CONFIG.tagline || "";
+    document.getElementById("pageTitle").textContent = CONFIG.title || "Gratta e Vinci";
+    document.getElementById("subtitle").textContent = CONFIG.subtitle || "";
+    document.getElementById("footerLoc").textContent =
+      (CONFIG.localeName || "Royal") + " · " + (CONFIG.tagline || "Ristorante · Pizzeria · Randazzo");
+    if (CONFIG.logoUrl) document.getElementById("logo").src = CONFIG.logoUrl;
+    document.title = (CONFIG.title || "Gratta e Vinci") + " · " + (CONFIG.localeName || "Royal");
+
+    /* ---------- Demo mode ---------- */
+    function runDemo(n) {
+      n = n || 1000;
+      var prizes = CONFIG.prizes || [];
+      var tot = totalWeight(prizes);
+      var counts = {};
+      prizes.forEach(function (p) { counts[p.id] = 0; });
+      for (var i = 0; i < n; i++) {
+        var p = drawPrize(prizes, Math.random);
+        counts[p.id] = (counts[p.id] || 0) + 1;
+      }
+      var smallN = 0, jackN = 0, noneN = 0;
+      prizes.forEach(function (p) {
+        if (!p.weight) return;
+        if (p.id === "ritenta") noneN += counts[p.id];
+        else if (p.isJackpot) jackN += counts[p.id];
+        else smallN += counts[p.id];
+      });
+
+      var totals = document.getElementById("demoTotals");
+      totals.innerHTML =
+        '<div class="tot"><b id="demo-small">' + (100 * smallN / n).toFixed(1) + '%</b><span>Premi piccoli<br>(' + smallN + ' su ' + n + ')</span></div>' +
+        '<div class="tot"><b id="demo-jackpot">' + (100 * jackN / n).toFixed(1) + '%</b><span>Jackpot<br>(' + jackN + ' su ' + n + ')</span></div>';
+
+      var tb = document.querySelector("#demoTable tbody");
+      tb.innerHTML = "";
+      var rows = [];
+      prizes.forEach(function (p) {
+        var atteso = tot ? 100 * (Number(p.weight) || 0) / tot : 0;
+        var ottenuto = 100 * (counts[p.id] || 0) / n;
+        var tr = document.createElement("tr");
+        if (p.isJackpot) tr.className = "is-jackpot";
+        if (!p.weight) tr.className = "is-zero";
+        tr.innerHTML =
+          "<td>" + escapeHtml(p.label) + (p.isJackpot ? " <small>jackpot</small>" : "") +
+          '<span class="bar"><i style="width:' + Math.min(100, ottenuto) + '%"></i></span></td>' +
+          '<td class="num">' + (Number(p.weight) || 0) + "</td>" +
+          '<td class="num">' + atteso.toFixed(1) + "%</td>" +
+          '<td class="num" data-ottenuto="' + p.id + '">' + ottenuto.toFixed(1) + "% <small>(" + (counts[p.id] || 0) + ")</small></td>";
+        tb.appendChild(tr);
+        rows.push({
+          id: p.id,
+          label: p.label,
+          isJackpot: !!p.isJackpot,
+          weight: Number(p.weight) || 0,
+          expected: atteso,
+          count: counts[p.id] || 0,
+          obtained: ottenuto
+        });
+      });
+      window.GEV_DEMO = { n: n, smallPct: 100 * smallN / n, jackpotPct: 100 * jackN / n, nonePct: 100 * noneN / n, rows: rows };
+      return window.GEV_DEMO;
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function (ch) {
+        return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch];
+      });
+    }
+
+    if (isDemo) {
+      document.body.classList.add("is-demo");
+      document.body.classList.remove("is-scratching-phase");
+      document.getElementById("hint").hidden = true;
+      runDemo(1000);
+      document.getElementById("demoRerun").addEventListener("click", function () { runDemo(1000); });
+      window.GEV = { runDemo: runDemo, CONFIG: CONFIG, drawPrize: drawPrize };
+      return;
+    }
+
+    /* ---------- Reset (test) ---------- */
+    if (wantReset) {
+      clearState();
+      params.delete("reset");
+      var next = location.pathname + (params.toString() ? "?" + params.toString() : "") + location.hash;
+      history.replaceState(null, "", next);
+    }
+
+    /* ---------- Issue or restore card ---------- */
+    function issueCard() {
+      var byId = prizeIndex();
+      var prize = forceId && byId[forceId] ? byId[forceId] : drawPrize(CONFIG.prizes, rand01);
+      return {
+        prizeId: prize.id,
+        code: makeCode(CONFIG.codePrefix),
+        issuedAt: new Date().toISOString(),
+        pizza: pizzaRef || null,
+        token: tokenRef || null,
+        revealed: false
+      };
+    }
+
+    var state = loadState();
+    if (!state || !state.prizeId || !state.code) {
+      state = issueCard();
+      saveState(state);
+    }
+
+    var prize = prizeIndex()[state.prizeId] || drawPrize(CONFIG.prizes, rand01);
+
+    function renderPrizeUnder() {
+      var el = document.getElementById("prizeUnder");
+      var kick = isNoWin(prize) ? "Nessun premio" : (prize.isJackpot ? "Jackpot" : "Hai vinto");
+      el.innerHTML =
+        '<div class="ico">' + iconSvg(prize.id) + "</div>" +
+        '<div class="kicker">' + kick + "</div>" +
+        '<div class="pname">' + escapeHtml(prize.label) + "</div>" +
+        '<div class="pdesc">' + escapeHtml(prize.description || "") + "</div>";
+    }
+    renderPrizeUnder();
+
+    function showResult() {
+      document.body.classList.remove("is-scratching-phase");
+      document.body.classList.add("is-revealed");
+      if (prize.isJackpot) document.body.classList.add("is-jackpot");
+      if (isNoWin(prize)) document.body.classList.add("is-nowin");
+      var block = document.getElementById("resultBlock");
+      block.hidden = false;
+      document.getElementById("resultIco").innerHTML = iconSvg(prize.id);
+      document.getElementById("resultKicker").textContent =
+        isNoWin(prize) ? "Nessun premio" : (prize.isJackpot ? "Jackpot" : "Hai vinto");
+      document.getElementById("resultTitle").textContent = prize.label;
+      document.getElementById("resultDesc").textContent = prize.description || "";
+      document.getElementById("resultCode").textContent = formatCodeDisplay(state.code);
+      document.getElementById("resultMeta").textContent = "Estratto il " + formatWhen(state.issuedAt);
+      document.getElementById("redeemText").textContent = CONFIG.redeemText || "";
+      document.getElementById("validityText").textContent = CONFIG.validityText || "";
+      if (prize.isJackpot) startConfetti();
+    }
+
+    /* ---------- Scratch canvas ---------- */
+    var canvas = document.getElementById("scratch");
+    var wrap = document.getElementById("ticket");
+    var ctx = canvas.getContext("2d");
+    var cssW = 0, cssH = 0, dpr = 1;
+    var scratching = false, lastX = 0, lastY = 0, revealed = !!state.revealed;
+    var threshold = (CONFIG.scratchThreshold >= 0.5 && CONFIG.scratchThreshold <= 0.6)
+      ? CONFIG.scratchThreshold
+      : 0.55;
+
+    function drawFoil() {
+      var w = cssW, h = cssH;
+      ctx.save();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.globalCompositeOperation = "source-over";
+      var grd = ctx.createLinearGradient(0, 0, w, h);
+      grd.addColorStop(0, "#f4f4f8");
+      grd.addColorStop(0.22, "#b4b4c0");
+      grd.addColorStop(0.48, "#ececf2");
+      grd.addColorStop(0.72, "#9696a4");
+      grd.addColorStop(1, "#d2d2dc");
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.globalAlpha = 0.16;
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1;
+      for (var i = -h; i < w + h; i += 3) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i + h, h);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 0.1;
+      ctx.strokeStyle = "#4a2030";
+      for (var j = -h; j < w + h; j += 6) {
+        ctx.beginPath();
+        ctx.moveTo(j, h);
+        ctx.lineTo(j + h, 0);
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = 1;
+      var vg = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.15, w / 2, h / 2, Math.max(w, h) * 0.7);
+      vg.addColorStop(0, "rgba(0,0,0,0)");
+      vg.addColorStop(1, "rgba(40,16,24,0.28)");
+      ctx.fillStyle = vg;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#5a1220";
+      ctx.font = "600 28px Cinzel, Palatino, serif";
+      ctx.fillText("GRATTA QUI", w / 2, h / 2 - 10);
+      ctx.font = "italic 17px 'EB Garamond', Palatino, serif";
+      ctx.fillStyle = "rgba(58,12,20,0.85)";
+      ctx.fillText("scopri il premio", w / 2, h / 2 + 22);
+      ctx.restore();
+    }
+
+    function resizeCanvas() {
+      if (revealed) return;
+      var rect = wrap.getBoundingClientRect();
+      cssW = Math.max(1, rect.width);
+      cssH = Math.max(1, rect.height);
+      dpr = Math.min(window.devicePixelRatio || 1, 3);
+      canvas.width = Math.round(cssW * dpr);
+      canvas.height = Math.round(cssH * dpr);
+      canvas.style.width = cssW + "px";
+      canvas.style.height = cssH + "px";
+      drawFoil();
+    }
+
+    function pointerPos(e) {
+      var r = canvas.getBoundingClientRect();
+      var src = e.touches && e.touches[0] ? e.touches[0] : (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0] : e);
+      return { x: src.clientX - r.left, y: src.clientY - r.top };
+    }
+
+    function scratchAt(x, y) {
+      ctx.save();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.globalCompositeOperation = "destination-out";
+      var rad = Math.max(26, cssW * 0.07);
+      var g = ctx.createRadialGradient(x, y, 0, x, y, rad);
+      g.addColorStop(0, "rgba(0,0,0,1)");
+      g.addColorStop(0.65, "rgba(0,0,0,0.9)");
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(x, y, rad, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function scratchLine(x0, y0, x1, y1) {
+      var dist = Math.hypot(x1 - x0, y1 - y0);
+      var steps = Math.max(1, Math.ceil(dist / 5));
+      for (var i = 0; i <= steps; i++) {
+        var t = i / steps;
+        scratchAt(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t);
+      }
+    }
+
+    function scratchedPercent() {
+      var data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      var cleared = 0, total = 0;
+      var step = 16 * 4;
+      for (var i = 3; i < data.length; i += step) {
+        total++;
+        if (data[i] < 128) cleared++;
+      }
+      return total ? cleared / total : 0;
+    }
+
+    function autoReveal(done) {
+      var frames = 0;
+      function tick() {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.fillStyle = "rgba(0,0,0,0.22)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+        frames++;
+        if (frames < 18 && scratchedPercent() < 0.98) requestAnimationFrame(tick);
+        else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          canvas.style.pointerEvents = "none";
+          if (done) done();
+        }
+      }
+      tick();
+    }
+
+    function finishReveal() {
+      if (revealed) return;
+      revealed = true;
+      state.revealed = true;
+      saveState(state);
+      autoReveal(showResult);
+    }
+
+    function onStart(e) {
+      if (revealed) return;
+      e.preventDefault();
+      scratching = true;
+      document.body.classList.add("is-scratch-started");
+      var p = pointerPos(e);
+      lastX = p.x; lastY = p.y;
+      scratchAt(p.x, p.y);
+    }
+    function onMove(e) {
+      if (!scratching || revealed) return;
+      e.preventDefault();
+      var p = pointerPos(e);
+      scratchLine(lastX, lastY, p.x, p.y);
+      lastX = p.x; lastY = p.y;
+      if (scratchedPercent() >= threshold) finishReveal();
+    }
+    function onEnd() { scratching = false; }
+
+    canvas.addEventListener("mousedown", onStart);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onEnd);
+    canvas.addEventListener("touchstart", onStart, { passive: false });
+    window.addEventListener("touchmove", onMove, { passive: false });
+    window.addEventListener("touchend", onEnd);
+    canvas.addEventListener("pointerdown", function (e) {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
+      onStart(e);
+    });
+    canvas.addEventListener("pointermove", onMove);
+    canvas.addEventListener("pointerup", onEnd);
+    canvas.addEventListener("pointercancel", onEnd);
+
+    /* ---------- Confetti (jackpot) ---------- */
+    var confettiTimer = null;
+    function startConfetti() {
+      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      var c = document.getElementById("confetti");
+      var cx = c.getContext("2d");
+      function size() {
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+      }
+      size();
+      var colors = [CONFIG.colors.gold || "#d4af37", CONFIG.colors.goldSoft || "#f0d78c", CONFIG.colors.cream || "#f6e7c8", CONFIG.colors.burgundyLight || "#8e1c2e", "#ffffff"];
+      var bits = [];
+      for (var i = 0; i < 90; i++) {
+        bits.push({
+          x: Math.random() * c.width,
+          y: -20 - Math.random() * c.height,
+          w: 6 + Math.random() * 7,
+          h: 8 + Math.random() * 10,
+          vx: -1.2 + Math.random() * 2.4,
+          vy: 2 + Math.random() * 3.2,
+          rot: Math.random() * Math.PI,
+          vr: -0.12 + Math.random() * 0.24,
+          color: colors[i % colors.length]
+        });
+      }
+      var start = Date.now();
+      function tick() {
+        cx.clearRect(0, 0, c.width, c.height);
+        bits.forEach(function (b) {
+          b.x += b.vx;
+          b.y += b.vy;
+          b.rot += b.vr;
+          if (b.y > c.height + 20) {
+            b.y = -20;
+            b.x = Math.random() * c.width;
+          }
+          cx.save();
+          cx.translate(b.x, b.y);
+          cx.rotate(b.rot);
+          cx.fillStyle = b.color;
+          cx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
+          cx.restore();
+        });
+        if (Date.now() - start < 5000) confettiTimer = requestAnimationFrame(tick);
+        else cx.clearRect(0, 0, c.width, c.height);
+      }
+      confettiTimer = requestAnimationFrame(tick);
+    }
+
+    /* ---------- Boot ---------- */
+    window.GEV = {
+      CONFIG: CONFIG,
+      state: state,
+      prize: prize,
+      reveal: finishReveal,
+      scratchedPercent: scratchedPercent,
+      drawPrize: drawPrize,
+      makeCode: makeCode,
+      checksum: checksum,
+      formatCodeDisplay: formatCodeDisplay
+    };
+
+    if (state.revealed) {
+      canvas.style.display = "none";
+      showResult();
+    } else {
+      var startDraw = function () { resizeCanvas(); };
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(startDraw).catch(startDraw);
+      else startDraw();
+      window.addEventListener("resize", function () {
+        if (!revealed) resizeCanvas();
+      });
+    }
+  })();
+  </script>
+</body>
+</html>

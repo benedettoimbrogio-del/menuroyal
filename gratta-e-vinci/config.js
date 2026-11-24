@@ -1,6 +1,8 @@
 /* =============================================================================
    GRATTA E VINCI ROYAL — Configurazione
    Modifica questo file per personalizzare locale, colori, premi e probabilità.
+   NB: nella versione monouso il premio lo decide il SERVER (tabella public.prizes):
+   i pesi qui sotto servono solo a etichette/descrizioni e alla pagina ?demo=1.
    I pesi sono relativi: la probabilità di un premio è peso / somma dei pesi.
    Con i valori predefiniti: premi piccoli = 75%, jackpot = 25%.
    Per abilitare "Ritenta" (nessun premio), alza il suo peso sopra 0
@@ -14,6 +16,12 @@ window.CONFIG = {
   subtitle: "Un biglietto con ogni pizza",
   logoUrl: "assets/logo_royal.png",
   codePrefix: "RYL",
+
+  /* Backend monouso (Supabase, progetto "gratta e vinci").
+     La chiave anon è PUBBLICA per natura: le tabelle sono chiuse (RLS senza policy)
+     e la pagina può solo chiamare le RPC check_code / claim_code. */
+  supabaseUrl: "https://ykggczyzvmlpuecffqlb.supabase.co",
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZ2djenl6dm1scHVlY2ZmcWxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTczNTEsImV4cCI6MjExMTEzMzM1MX0.3RuIbrtCcyClLzLpAz8fjD3xJx03m93GLLp9u2Lalfk",
 
   colors: {
     background: "#12070a",

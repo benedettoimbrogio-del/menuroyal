@@ -142,6 +142,13 @@
     body.is-revealed .hint { display: none; }
     body.is-revealed .scratch-block { display: none; }
     body.is-scratching-phase .result-block { display: none; }
+    body.is-status .hint,
+    body.is-status .scratch-block,
+    body.is-status #resultBlock { display: none !important; }
+    body.is-status .status-block { display: block !important; }
+    .status-block { display: none; margin-top: 18px; text-align: center; }
+    .status-block .result-title { margin-top: 6px; }
+    .status-block .btn { margin-top: 16px; }
 
     .ticket {
       position: relative;
@@ -447,7 +454,6 @@
   <canvas id="confetti" aria-hidden="true"></canvas>
   <div class="wrap">
     <header class="header">
-      <div class="proto-badge">Prototipo dimostrativo</div>
       <img class="logo" id="logo" alt="Royal Randazzo" src="assets/logo_royal.png">
       <div class="locale" id="localeName">Royal Randazzo</div>
       <div class="tagline" id="tagline">Ristorante · Pizzeria · Randazzo</div>
@@ -480,6 +486,14 @@
       <p class="validity" id="validityText"></p>
     </section>
 
+    <section class="status-block" id="statusBlock" aria-live="polite">
+      <div class="result-ico" id="statusIco"></div>
+      <div class="result-kicker" id="statusKicker"></div>
+      <h2 class="result-title" id="statusTitle"></h2>
+      <p class="result-desc" id="statusDesc"></p>
+      <button class="btn" type="button" id="statusRetry" hidden>Riprova</button>
+    </section>
+
     <section class="demo" id="demoSection">
       <h2>Simulazione di 1000 estrazioni</h2>
       <div class="totals" id="demoTotals"></div>
@@ -503,7 +517,7 @@
     <footer>
       <div class="loc" id="footerLoc">Royal · Ristorante · Pizzeria · Randazzo (CT)</div>
       <p>Iniziativa promozionale del locale. Non è un gioco d’azzardo e non è collegata al Gratta e Vinci dello Stato.</p>
-      <p>I premi di questo prototipo sono estratti sul dispositivo: per l’uso reale serve un sistema in cassa che valida i codici.</p>
+      <p>Il premio è estratto dal sistema del locale. Ogni foglietto vale una sola volta e solo sul telefono che lo ha grattato per primo.</p>
     </footer>
   </div>
 
@@ -777,30 +791,115 @@
       history.replaceState(null, "", next);
     }
 
-    /* ---------- Issue or restore card ---------- */
-    function issueCard() {
-      var byId = prizeIndex();
-      var prize = forceId && byId[forceId] ? byId[forceId] : drawPrize(CONFIG.prizes, rand01);
+    /* ---------- Backend monouso (Supabase) ---------- */
+    var SB_URL = (CONFIG.supabaseUrl || "").replace(/\/+$/, "");
+    var SB_KEY = CONFIG.supabaseAnonKey || "";
+    var STATUS_ICONS = {
+      used: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="20"/><path d="M18 46 L46 18"/></svg>',
+      invalid: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="20"/><path d="M32 20 v16"/><circle cx="32" cy="44" r="1.5"/></svg>',
+      scan: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22 V12 H22 M42 12 H52 V22 M52 42 V52 H42 M22 52 H12 V42"/><rect x="22" y="22" width="8" height="8"/><rect x="34" y="22" width="8" height="8"/><rect x="22" y="34" width="8" height="8"/><path d="M34 34 h8 v8"/></svg>'
+    };
+
+    function deviceId() {
+      var k = "royal_gev_device_v1", id = null;
+      try { id = localStorage.getItem(k); } catch (e) {}
+      if (!id) {
+        if (crypto.randomUUID) id = crypto.randomUUID();
+        else { id = ""; for (var i = 0; i < 32; i++) id += randomChar(); }
+        try { localStorage.setItem(k, id); } catch (e) {}
+      }
+      return id;
+    }
+
+    function rpc(name, body) {
+      return fetch(SB_URL + "/rest/v1/rpc/" + name, {
+        method: "POST",
+        headers: {
+          "apikey": SB_KEY,
+          "Authorization": "Bearer " + SB_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body),
+        cache: "no-store"
+      }).then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      });
+    }
+
+    function showStatus(kind, title, desc, retry) {
+      document.body.classList.remove("is-scratching-phase");
+      document.body.classList.add("is-status");
+      document.getElementById("statusIco").innerHTML = STATUS_ICONS[kind] || STATUS_ICONS.invalid;
+      document.getElementById("statusKicker").textContent =
+        kind === "used" ? "Biglietto già grattato" : (kind === "scan" ? "Come si gioca" : "Attenzione");
+      document.getElementById("statusTitle").textContent = title;
+      document.getElementById("statusDesc").textContent = desc || "";
+      var btn = document.getElementById("statusRetry");
+      btn.hidden = !retry;
+      btn.onclick = retry ? function () { location.reload(); } : null;
+      window.GEV_STATUS = kind;
+    }
+
+    function showUsed(claimedAt) {
+      showStatus("used", "Codice già utilizzato",
+        "Questo foglietto è già stato grattato" + (claimedAt ? " il " + formatWhen(claimedAt) : "") +
+        " su un altro telefono. Ogni codice vale una sola volta.");
+    }
+    function showInvalid() {
+      showStatus("invalid", "Codice non valido",
+        "Il codice di questo QR non risulta tra i foglietti del locale. Controlla di aver inquadrato un foglietto Royal originale.");
+    }
+    function showNetError() {
+      showStatus("invalid", "Connessione non disponibile",
+        "Non riesco a verificare il foglietto. Controlla la connessione e riprova: il codice non è stato consumato.", true);
+    }
+
+    var byIdAll = prizeIndex();
+    function prizeFromServer(res) {
+      var base = byIdAll[res.prize] || {};
       return {
-        prizeId: prize.id,
-        code: makeCode(CONFIG.codePrefix),
-        issuedAt: new Date().toISOString(),
-        pizza: pizzaRef || null,
-        token: tokenRef || null,
+        id: res.prize,
+        label: res.prize_label || base.label || res.prize,
+        description: res.prize_description || base.description || "",
+        isJackpot: !!res.is_jackpot,
+        weight: base.weight
+      };
+    }
+    function stateFromServer(res) {
+      return {
+        prizeId: res.prize,
+        code: (CONFIG.codePrefix || "RYL") + "-" + res.code.slice(0, 4) + "-" + res.code.slice(4),
+        issuedAt: res.claimed_at,
+        token: res.code,
         revealed: false
       };
     }
 
-    var state = loadState();
-    if (!state || !state.prizeId || !state.code) {
-      state = issueCard();
-      saveState(state);
+    /* Nessun ?t= : niente gioco libero */
+    if (!tokenRef) {
+      showStatus("scan", "Inquadra il QR del tuo foglietto",
+        "Per giocare inquadra con la fotocamera il QR stampato sul foglietto «Gratta e vinci Royal» che ricevi con la pizza. Ogni foglietto vale una sola volta.");
+      window.GEV = { CONFIG: CONFIG, status: "scan" };
+      return;
+    }
+    if (!SB_URL || !SB_KEY) {
+      showNetError();
+      return;
     }
 
-    var prize = prizeIndex()[state.prizeId] || drawPrize(CONFIG.prizes, rand01);
+    var DEVICE = deviceId();
+    var prize = { id: "", label: "", description: "", isJackpot: false };
+    var state = { prizeId: null, code: "", issuedAt: null, token: tokenRef, revealed: false };
+    var claimPromise = null;   /* parte alla prima grattata */
+    var claimed = false;
 
     function renderPrizeUnder() {
       var el = document.getElementById("prizeUnder");
+      if (!prize.id) {
+        el.innerHTML = '<div class="kicker">Un attimo…</div><div class="pdesc">sto aprendo il tuo biglietto</div>';
+        return;
+      }
       var kick = isNoWin(prize) ? "Nessun premio" : (prize.isJackpot ? "Jackpot" : "Hai vinto");
       el.innerHTML =
         '<div class="ico">' + iconSvg(prize.id) + "</div>" +
@@ -822,7 +921,7 @@
         isNoWin(prize) ? "Nessun premio" : (prize.isJackpot ? "Jackpot" : "Hai vinto");
       document.getElementById("resultTitle").textContent = prize.label;
       document.getElementById("resultDesc").textContent = prize.description || "";
-      document.getElementById("resultCode").textContent = formatCodeDisplay(state.code);
+      document.getElementById("resultCode").textContent = state.code;
       document.getElementById("resultMeta").textContent = "Estratto il " + formatWhen(state.issuedAt);
       document.getElementById("redeemText").textContent = CONFIG.redeemText || "";
       document.getElementById("validityText").textContent = CONFIG.validityText || "";
@@ -964,17 +1063,43 @@
       tick();
     }
 
+    function startClaim() {
+      if (claimPromise) return claimPromise;
+      claimPromise = rpc("claim_code", { p_token: tokenRef, p_device: DEVICE }).then(function (res) {
+        if (res && res.status === "ok") {
+          prize = prizeFromServer(res);
+          state = stateFromServer(res);
+          claimed = true;
+          window.GEV.prize = prize;
+          window.GEV.state = state;
+          renderPrizeUnder();
+          return true;
+        }
+        if (res && res.status === "used") showUsed(res.claimed_at);
+        else showInvalid();
+        return false;
+      }).catch(function () {
+        claimPromise = null;
+        showNetError();
+        return false;
+      });
+      return claimPromise;
+    }
+
     function finishReveal() {
       if (revealed) return;
       revealed = true;
-      state.revealed = true;
-      saveState(state);
-      autoReveal(showResult);
+      (claimPromise || startClaim()).then(function (ok) {
+        if (!ok) return;
+        state.revealed = true;
+        autoReveal(showResult);
+      });
     }
 
     function onStart(e) {
       if (revealed) return;
       e.preventDefault();
+      startClaim();
       scratching = true;
       document.body.classList.add("is-scratch-started");
       var p = pointerPos(e);
@@ -1061,25 +1186,43 @@
       CONFIG: CONFIG,
       state: state,
       prize: prize,
+      device: DEVICE,
       reveal: finishReveal,
       scratchedPercent: scratchedPercent,
-      drawPrize: drawPrize,
-      makeCode: makeCode,
-      checksum: checksum,
       formatCodeDisplay: formatCodeDisplay
     };
 
-    if (state.revealed) {
-      canvas.style.display = "none";
-      showResult();
-    } else {
-      var startDraw = function () { resizeCanvas(); };
+    function startScratch() {
+      renderPrizeUnder();
+      var startDraw = function () { resizeCanvas(); window.GEV.ready = true; };
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(startDraw).catch(startDraw);
       else startDraw();
       window.addEventListener("resize", function () {
         if (!revealed) resizeCanvas();
       });
     }
+
+    /* All'apertura controllo il codice SENZA consumarlo */
+    rpc("check_code", { p_token: tokenRef, p_device: DEVICE }).then(function (res) {
+      window.GEV.check = res;
+      if (res && res.status === "new") return startScratch();
+      if (res && res.status === "ok") {
+        /* stesso telefono: riapre il suo risultato */
+        prize = prizeFromServer(res);
+        state = stateFromServer(res);
+        state.revealed = true;
+        claimed = true;
+        revealed = true;
+        window.GEV.prize = prize;
+        window.GEV.state = state;
+        canvas.style.display = "none";
+        renderPrizeUnder();
+        showResult();
+        return;
+      }
+      if (res && res.status === "used") return showUsed(res.claimed_at);
+      showInvalid();
+    }).catch(function () { showNetError(); });
   })();
   </script>
 </body>

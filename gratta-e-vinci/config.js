@@ -1,9 +1,8 @@
 /* =============================================================================
    GRATTA E VINCI ROYAL — Configurazione
    Modifica questo file per personalizzare locale, colori, premi e probabilità.
-   NB: nella versione monouso il premio lo decide il SERVER (tabella public.prizes):
-   i pesi qui sotto servono solo a etichette/descrizioni e alla pagina ?demo=1.
-   I pesi sono relativi: la probabilità di un premio è peso / somma dei pesi.
+   NB: il premio lo decide il SERVER (urna a scorte annuali, tabella public.prizes).
+   (Testo storico) I pesi sono relativi: la probabilità di un premio è peso / somma dei pesi.
    Con i valori predefiniti: premi piccoli = 75%, jackpot = 25%.
    Per abilitare "Ritenta" (nessun premio), alza il suo peso sopra 0
    (ricorda che così i percentuali degli altri premi scendono in proporzione).
@@ -42,78 +41,18 @@ window.CONFIG = {
   validityText: "Valido sul prossimo ordine entro 30 giorni.",
   redeemText: "Mostra questa schermata alla cassa, oppure fai uno screenshot.",
 
+  /* Testo per iPhone / PlayStation (al posto di validityText). */
+  jackpotText: "Per il ritiro del premio rivolgiti al locale mostrando questa schermata.",
+
+  /* SOLO etichette, descrizioni e icone di riserva. NESSUN peso: il premio lo decide
+     il SERVER (tabella public.prizes, estrazione a urna sulle scorte annuali). */
   prizes: [
-    {
-      id: "sconto",
-      label: "Sconto 10%",
-      description: "Sconto del 10% sul prossimo ordine.",
-      weight: 12,
-      isJackpot: false
-    },
-    {
-      id: "bibita",
-      label: "Bibita omaggio",
-      description: "Una bibita omaggio sul prossimo ordine.",
-      weight: 11,
-      isJackpot: false
-    },
-    {
-      id: "arancinetti",
-      label: "Arancinetti omaggio",
-      description: "Arancinetti omaggio sul prossimo ordine.",
-      weight: 11,
-      isJackpot: false
-    },
-    {
-      id: "spirale",
-      label: "Spirale di patate",
-      description: "Spirale di patate omaggio sul prossimo ordine.",
-      weight: 11,
-      isJackpot: false
-    },
-    {
-      id: "petali",
-      label: "Petali di patate",
-      description: "Petali di patate omaggio sul prossimo ordine.",
-      weight: 10,
-      isJackpot: false
-    },
-    {
-      id: "crocchette",
-      label: "Crocchette di patate",
-      description: "Crocchette di patate omaggio sul prossimo ordine.",
-      weight: 10,
-      isJackpot: false
-    },
-    {
-      id: "bocconcini",
-      label: "Bocconcini di pollo",
-      description: "Bocconcini di pollo omaggio sul prossimo ordine.",
-      weight: 10,
-      isJackpot: false
-    },
-    /* --- jackpot (totale 25) --- */
-    {
-      id: "pizza",
-      label: "Pizza gratis",
-      description: "Una pizza omaggio a scelta dal menù.",
-      weight: 15,
-      isJackpot: true
-    },
-    {
-      id: "cena",
-      label: "Cena per due",
-      description: "Cena per due persone: due pizze e due bibite.",
-      weight: 10,
-      isJackpot: true
-    },
-    /* Abilitabile: alza il peso per introdurre biglietti non vincenti. */
-    {
-      id: "ritenta",
-      label: "Ritenta",
-      description: "Nessun premio questa volta. Ritenta con la prossima pizza!",
-      weight: 0,
-      isJackpot: false
-    }
+    { id: "iphone",      label: "iPhone 18",        description: "Hai vinto un iPhone 18!",                isJackpot: true },
+    { id: "playstation", label: "PlayStation",      description: "Hai vinto una PlayStation!",             isJackpot: true },
+    { id: "pizza",       label: "Pizza gratis",     description: "Una pizza omaggio a scelta dal menù.",   isJackpot: false },
+    { id: "buono10",     label: "Buono da 10 €",    description: "Un buono da 10 € sul prossimo ordine.",  isJackpot: false },
+    { id: "bibita",      label: "Bibita omaggio",   description: "Una bibita omaggio sul prossimo ordine.", isJackpot: false },
+    { id: "patatine",    label: "Patatine omaggio", description: "Patatine omaggio sul prossimo ordine.",  isJackpot: false },
+    { id: "ritenta",     label: "Ritenta",          description: "Non hai vinto questa volta. Ritenta con la prossima pizza!", isJackpot: false, isLosing: true }
   ]
 };

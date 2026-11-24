@@ -523,13 +523,13 @@ footer.foot .note {
     </header>
 
     <div class="toolbar">
-      <label class="switch">
-        <input type="checkbox" id="testMode" checked>
+      <label class="switch" hidden style="display:none">
+        <input type="checkbox" id="testMode">
         <span>Modalità prova</span>
       </label>
       <button type="button" id="resetBtn">Richiudi tutto</button>
     </div>
-    <p class="hint" id="hint">Modalità prova: tocca un giorno per scoprire l’offerta.</p>
+    <p class="hint" id="hint">Si aprono solo i giorni già arrivati a dicembre 2026.</p>
 
     <div class="stage">
       <div class="tree-box">
@@ -879,6 +879,15 @@ footer.foot .note {
 
   testModeEl.addEventListener("change", updateHint);
   resetBtn.addEventListener("click", richiudiTutto);
+
+  if (testModeEl && new URLSearchParams(window.location.search).get("prova") === "1") {
+    testModeEl.checked = true;
+    var label = testModeEl.parentElement;
+    if (label) {
+      label.hidden = false;
+      label.style.display = "";
+    }
+  }
 
   buildTree();
   restore();

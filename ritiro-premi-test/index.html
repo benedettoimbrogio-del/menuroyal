@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#4A2C14">
+<title>Ritiro premi · Royal Randazzo (staff)</title>
+<style>
+  @font-face { font-family: "Cinzel"; src: url("fonts/Cinzel.woff2") format("woff2"); font-display: swap; }
+  @font-face { font-family: "EB Garamond"; src: url("fonts/EBGaramond.woff2") format("woff2"); font-display: swap; }
+  :root { --cream:#FBF6EB; --cream2:#F3EAD6; --brown:#4A2C14; --brown2:#6B4A2A; --gold:#d4af37; --gold2:#8C6418;
+          --ok:#1E7A3C; --warn:#B4500A; --bad:#A01E1E; --grey:#6F655A; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; background:var(--cream); color:var(--brown); font-family:"EB Garamond", Georgia, serif; font-size:19px; }
+  body { min-height:100vh; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+  header { background:var(--brown); color:var(--cream); display:flex; align-items:center; gap:12px; padding:10px 16px; border-bottom:4px solid var(--gold); }
+  header img { width:46px; height:46px; object-fit:contain; background:var(--cream); border-radius:50%; padding:3px; }
+  header h1 { font-family:"Cinzel", serif; font-size:20px; margin:0; letter-spacing:.04em; line-height:1.1; }
+  header small { display:block; font-size:14px; color:var(--gold); letter-spacing:.08em; }
+  header button { margin-left:auto; background:none; border:1px solid var(--gold); color:var(--cream); border-radius:10px; padding:8px 10px; font:inherit; font-size:15px; }
+  main { max-width:560px; margin:0 auto; padding:16px; }
+  .card { background:#fff; border:2px solid var(--gold); border-radius:18px; padding:18px; margin-bottom:16px; box-shadow:0 2px 0 var(--gold2); }
+  h2 { font-family:"Cinzel", serif; font-size:20px; margin:0 0 10px; color:var(--brown); }
+  label { display:block; font-size:16px; color:var(--brown2); margin:6px 0; }
+  input[type=text], input[type=password], input[type=tel] { width:100%; font:inherit; font-size:24px; padding:14px; border:2px solid var(--brown2);
+          border-radius:12px; background:var(--cream); color:var(--brown); letter-spacing:.08em; text-align:center; }
+  input:focus { outline:3px solid var(--gold); }
+  .btn { display:block; width:100%; border:0; border-radius:16px; padding:18px 14px; margin-top:12px; font-family:"Cinzel", serif;
+         font-size:21px; font-weight:700; letter-spacing:.03em; cursor:pointer; min-height:64px; }
+  .btn-main { background:var(--brown); color:var(--cream); border:3px solid var(--gold); }
+  .btn-gold { background:var(--gold); color:var(--brown); }
+  .btn-light { background:var(--cream2); color:var(--brown); border:2px solid var(--brown2); }
+  .btn-redeem { background:var(--ok); color:#fff; font-size:25px; min-height:84px; border:3px solid var(--gold); }
+  .btn-redeem.confirm { background:var(--warn); }
+  .btn:disabled { opacity:.55; }
+  .row { display:flex; gap:10px; } .row .btn { flex:1; }
+  .hint { font-size:16px; color:var(--brown2); margin:8px 0 0; }
+  .err { color:var(--bad); font-weight:600; min-height:1.2em; margin-top:8px; }
+  .hidden { display:none !important; }
+  #videoWrap { position:relative; border-radius:14px; overflow:hidden; background:#000; aspect-ratio: 1 / 1; margin-top:10px; }
+  #video { width:100%; height:100%; object-fit:cover; display:block; }
+  #videoWrap .frame { position:absolute; inset:14%; border:4px solid var(--gold); border-radius:16px; box-shadow:0 0 0 999px rgba(0,0,0,.35); }
+  .status { border-radius:14px; padding:16px; text-align:center; color:#fff; margin-bottom:14px; }
+  .status .big { font-family:"Cinzel", serif; font-size:26px; font-weight:700; line-height:1.15; }
+  .status .sub { font-size:18px; margin-top:6px; }
+  .s-ok { background:var(--ok); } .s-warn { background:var(--warn); } .s-bad { background:var(--bad); } .s-grey { background:var(--grey); }
+  .prize { text-align:center; padding:6px 0 4px; }
+  .prize .label { font-family:"Cinzel", serif; font-size:28px; font-weight:700; color:var(--brown); }
+  .prize .desc { font-size:17px; color:var(--brown2); margin-top:4px; }
+  .prize .value { display:inline-block; margin-top:8px; background:var(--gold); color:var(--brown); border-radius:999px; padding:3px 14px; font-weight:700; }
+  dl { display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:17px; margin:12px 0 0; }
+  dt { color:var(--brown2); } dd { margin:0; font-weight:600; }
+  .reminder { background:var(--cream); border:2px dashed var(--gold2); border-radius:12px; padding:10px 12px; font-size:17px; margin-top:12px; text-align:center; }
+  .test { display:inline-block; background:#2B5DA8; color:#fff; border-radius:8px; padding:2px 10px; font-size:14px; font-weight:700; letter-spacing:.06em; }
+  .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size:22px; letter-spacing:.08em; }
+  footer { text-align:center; font-size:14px; color:var(--brown2); padding:10px 16px 24px; }
+</style>
+</head>
+<body>
+<header>
+  <img src="logo_royal.png" alt="Royal">
+  <div><h1>Ritiro premi</h1><small>GRATTA E VINCI · SOLO STAFF</small></div>
+  <button id="logoutBtn" class="hidden" type="button">Esci</button>
+</header>
+
+<main>
+  <!-- 1. PIN -->
+  <section id="loginView" class="card">
+    <h2>Accesso staff</h2>
+    <label for="pin">PIN del personale</label>
+    <input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="••••••••">
+    <label style="display:flex;align-items:center;gap:10px;margin-top:12px;font-size:17px">
+      <input id="remember" type="checkbox" style="width:24px;height:24px"> Ricorda su questo telefono
+    </label>
+    <button id="loginBtn" class="btn btn-main" type="button">Entra</button>
+    <div id="loginErr" class="err" role="alert"></div>
+  </section>
+
+  <!-- 2. Scansione / codice -->
+  <section id="scanView" class="card hidden">
+    <h2>Controlla un biglietto</h2>
+    <button id="scanBtn" class="btn btn-gold" type="button">📷 Inquadra il QR</button>
+    <div id="videoWrap" class="hidden"><video id="video" playsinline muted></video><div class="frame"></div></div>
+    <button id="stopBtn" class="btn btn-light hidden" type="button">Chiudi fotocamera</button>
+    <div id="camErr" class="err" role="alert"></div>
+    <label for="code" style="margin-top:14px">Oppure scrivi il codice del biglietto</label>
+    <input id="code" type="text" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="XXXX-XXXX" maxlength="9">
+    <button id="checkBtn" class="btn btn-main" type="button">Controlla codice</button>
+    <div id="checkErr" class="err" role="alert"></div>
+  </section>
+
+  <!-- 3. Esito -->
+  <section id="resultView" class="card hidden" aria-live="polite">
+    <div id="status" class="status"><div class="big"></div><div class="sub"></div></div>
+    <div style="text-align:center"><span class="code" id="rCode"></span> <span id="rTest" class="test hidden">TEST</span></div>
+    <div id="rPrize" class="prize hidden"><div class="label"></div><div class="desc"></div><div class="value hidden"></div></div>
+    <dl>
+      <dt>Grattato</dt><dd id="rScratched">—</dd>
+      <dt>Ritirato</dt><dd id="rRedeemed">—</dd>
+      <dt id="rNoteT" class="hidden">Nota</dt><dd id="rNote" class="hidden"></dd>
+    </dl>
+    <div id="reminder" class="reminder hidden">⚠️ Il premio vale <b>solo sul PROSSIMO ordine</b>, non su quello di oggi.</div>
+    <div id="redeemBox" class="hidden">
+      <label for="note" style="margin-top:14px">Nota (facoltativa, es. nome cliente o n° ordine)</label>
+      <input id="note" type="text" maxlength="200" style="font-size:19px;letter-spacing:0;text-align:left">
+      <button id="redeemBtn" class="btn btn-redeem" type="button">✓ SEGNA COME RITIRATO</button>
+    </div>
+    <div id="redeemErr" class="err" role="alert"></div>
+    <button id="againBtn" class="btn btn-light" type="button">Nuovo biglietto</button>
+  </section>
+</main>
+<footer>Royal Randazzo · pagina riservata al personale</footer>
+
+<script src="config.js"></script>
+<script src="vendor/jsQR.js"></script>
+<script>
+(function () {
+  "use strict";
+  var CFG = window.RITIRO_CONFIG || {};
+  var SB_URL = (CFG.supabaseUrl || "").replace(/\/+$/, ""), SB_KEY = CFG.supabaseAnonKey || "";
+  var PIN_KEY = "royal_ritiro_pin";
+  var $ = function (id) { return document.getElementById(id); };
+  var pin = sessionStorage.getItem(PIN_KEY) || localStorage.getItem(PIN_KEY) || "";
+  var current = null, confirmTimer = null, stream = null, scanning = false, detector = null;
+
+  function rpc(name, body) {
+    return fetch(SB_URL + "/rest/v1/rpc/" + name, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SB_KEY, Authorization: "Bearer " + SB_KEY },
+      body: JSON.stringify(body)
+    }).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+  }
+  function show(view) {
+    ["loginView", "scanView", "resultView"].forEach(function (v) { $(v).classList.toggle("hidden", v !== view); });
+    $("logoutBtn").classList.toggle("hidden", view === "loginView");
+    window.scrollTo(0, 0);
+  }
+  function fmt(ts) {
+    if (!ts) return "";
+    var d = new Date(ts);
+    return d.toLocaleDateString("it-IT", { timeZone: "Europe/Rome", day: "2-digit", month: "2-digit", year: "numeric" }) +
+      " alle " + d.toLocaleTimeString("it-IT", { timeZone: "Europe/Rome", hour: "2-digit", minute: "2-digit" });
+  }
+  function extractToken(text) {
+    text = String(text || "").trim();
+    var m = text.match(/[?&]t=([A-Za-z0-9-]+)/);
+    if (m) text = m[1];
+    return text.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  }
+  function pinProblem(st) {
+    if (st === "bad_pin") { logout("PIN non valido o cambiato: rientra."); return true; }
+    if (st === "locked") { logout("Troppi PIN sbagliati: riprova tra 15 minuti."); return true; }
+    return false;
+  }
+
+  /* ---- login ---- */
+  function login() {
+    var p = $("pin").value.trim();
+    $("loginErr").textContent = "";
+    if (p.length < 4) { $("loginErr").textContent = "Scrivi il PIN."; return; }
+    $("loginBtn").disabled = true;
+    rpc("staff_login", { p_pin: p }).then(function (r) {
+      if (r.status === "ok") {
+        pin = p;
+        sessionStorage.setItem(PIN_KEY, p);
+        if ($("remember").checked) localStorage.setItem(PIN_KEY, p); else localStorage.removeItem(PIN_KEY);
+        $("pin").value = "";
+        show("scanView");
+      } else if (r.status === "locked") {
+        $("loginErr").textContent = "Troppi tentativi sbagliati: riprova tra 15 minuti.";
+      } else {
+        $("loginErr").textContent = "PIN sbagliato.";
+      }
+    }).catch(function () { $("loginErr").textContent = "Connessione assente. Riprova."; })
+      .then(function () { $("loginBtn").disabled = false; });
+  }
+  function logout(msg) {
+    stopCamera(); pin = "";
+    sessionStorage.removeItem(PIN_KEY); localStorage.removeItem(PIN_KEY);
+    show("loginView");
+    $("loginErr").textContent = msg || "";
+  }
+
+  /* ---- controllo codice ---- */
+  function check(raw) {
+    var token = extractToken(raw);
+    $("checkErr").textContent = "";
+    if (!/^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$/.test(token)) {
+      $("checkErr").textContent = "Il codice ha 8 caratteri, es. ABCD-EF23.";
+      return;
+    }
+    $("checkBtn").disabled = true;
+    rpc("staff_check_code", { p_pin: pin, p_token: token }).then(function (r) {
+      if (pinProblem(r.status)) return;
+      render(r, token);
+    }).catch(function () { $("checkErr").textContent = "Connessione assente. Riprova."; })
+      .then(function () { $("checkBtn").disabled = false; });
+  }
+
+  function setStatus(cls, big, sub) {
+    var s = $("status"); s.className = "status " + cls;
+    s.querySelector(".big").textContent = big; s.querySelector(".sub").textContent = sub || "";
+  }
+
+  function render(r, token, justRedeemed) {
+    current = r;
+    clearConfirm();
+    $("redeemErr").textContent = ""; $("note").value = "";
+    var code = r.code_display || (token ? token.slice(0, 4) + "-" + token.slice(4) : "");
+    $("rCode").textContent = code;
+    $("rTest").classList.toggle("hidden", !r.is_test);
+    var hasPrize = r.status !== "invalid" && r.scratched && r.prize;
+    $("rPrize").classList.toggle("hidden", !hasPrize);
+    if (hasPrize) {
+      $("rPrize").querySelector(".label").textContent = r.prize_label || r.prize;
+      $("rPrize").querySelector(".desc").textContent = r.win ? (r.prize_description || "") : "";
+      var v = $("rPrize").querySelector(".value");
+      v.classList.toggle("hidden", !(r.win && r.value_eur));
+      if (r.value_eur) v.textContent = "Valore " + Number(r.value_eur).toLocaleString("it-IT") + " €";
+    }
+    $("rScratched").textContent = r.status === "invalid" ? "—" : (r.scratched ? "Sì, il " + fmt(r.scratched_at) : "No");
+    $("rRedeemed").textContent = r.status === "invalid" ? "—" : (r.redeemed ? "Sì, il " + fmt(r.redeemed_at) : "No");
+    var hasNote = !!r.redeemed_note;
+    $("rNoteT").classList.toggle("hidden", !hasNote); $("rNote").classList.toggle("hidden", !hasNote);
+    $("rNote").textContent = r.redeemed_note || "";
+    var canRedeem = false;
+    if (r.status === "invalid") setStatus("s-bad", "✗ CODICE NON VALIDO", "Questo codice non esiste. Non consegnare nulla.");
+    else if (!r.scratched) setStatus("s-grey", "NON ANCORA GRATTATO", "Il cliente deve prima grattarlo inquadrando il QR col suo telefono.");
+    else if (!r.win) setStatus("s-grey", "NON VINCENTE", "Questo biglietto non ha vinto premi.");
+    else if (r.redeemed) setStatus(justRedeemed ? "s-ok" : "s-bad",
+        justRedeemed ? "✓ RITIRATO ORA" : "⚠ GIÀ RITIRATO",
+        (justRedeemed ? "Registrato il " : "Premio già consegnato il ") + fmt(r.redeemed_at) + (justRedeemed ? "." : ". Non consegnare di nuovo."));
+    else { setStatus("s-ok", "✓ PREMIO VALIDO", "Da consegnare: non ancora ritirato."); canRedeem = true; }
+    $("redeemBox").classList.toggle("hidden", !canRedeem);
+    $("reminder").classList.toggle("hidden", !(r.status !== "invalid" && r.scratched && r.win));
+    show("resultView");
+  }
+
+  /* ---- ritiro: doppio tocco di conferma ---- */
+  function clearConfirm() {
+    clearTimeout(confirmTimer);
+    var b = $("redeemBtn"); b.classList.remove("confirm"); b.textContent = "✓ SEGNA COME RITIRATO"; b.disabled = false;
+  }
+  function redeemTap() {
+    var b = $("redeemBtn");
+    if (!b.classList.contains("confirm")) {
+      b.classList.add("confirm"); b.textContent = "Tocca ancora per confermare";
+      confirmTimer = setTimeout(clearConfirm, 5000);
+      return;
+    }
+    clearTimeout(confirmTimer);
+    b.disabled = true; b.textContent = "Salvataggio…";
+    rpc("staff_redeem_code", { p_pin: pin, p_token: current.code, p_note: $("note").value }).then(function (r) {
+      if (pinProblem(r.status)) return;
+      if (r.status === "redeemed") render(r, null, true);
+      else if (r.status === "already_redeemed") render(r);
+      else if (r.status === "invalid") render(r, current.code);
+      else { render(r); $("redeemErr").textContent = "Non ritirabile (" + r.status + ")."; }
+    }).catch(function () { clearConfirm(); $("redeemErr").textContent = "Connessione assente: NON registrato. Riprova."; });
+  }
+
+  /* ---- fotocamera + QR ---- */
+  function startCamera() {
+    $("camErr").textContent = "";
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      $("camErr").textContent = "Fotocamera non disponibile qui: scrivi il codice."; return;
+    }
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false }).then(function (s) {
+      stream = s; var v = $("video"); v.srcObject = s; v.play();
+      $("videoWrap").classList.remove("hidden"); $("stopBtn").classList.remove("hidden"); $("scanBtn").classList.add("hidden");
+      scanning = true;
+      if (!detector && "BarcodeDetector" in window) {
+        try { detector = new window.BarcodeDetector({ formats: ["qr_code"] }); } catch (e) { detector = null; }
+      }
+      requestAnimationFrame(tick);
+    }).catch(function () {
+      $("camErr").textContent = "Permesso fotocamera negato: consentilo nelle impostazioni del browser, oppure scrivi il codice.";
+    });
+  }
+  function stopCamera() {
+    scanning = false;
+    if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+    $("videoWrap").classList.add("hidden"); $("stopBtn").classList.add("hidden"); $("scanBtn").classList.remove("hidden");
+  }
+  var canvas = document.createElement("canvas"), ctx = canvas.getContext("2d", { willReadFrequently: true }), last = 0;
+  function found(text) {
+    var t = extractToken(text);
+    if (!/^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$/.test(t)) return false;
+    stopCamera();
+    if (navigator.vibrate) navigator.vibrate(80);
+    $("code").value = t.slice(0, 4) + "-" + t.slice(4);
+    check(t);
+    return true;
+  }
+  function tick(now) {
+    if (!scanning) return;
+    var v = $("video");
+    if (now - last < 150 || v.readyState < 2) { requestAnimationFrame(tick); return; }
+    last = now;
+    if (detector) {
+      detector.detect(v).then(function (codes) {
+        if (!(codes.length && found(codes[0].rawValue))) requestAnimationFrame(tick);
+      }).catch(function () { detector = null; requestAnimationFrame(tick); });
+      return;
+    }
+    var w = v.videoWidth, h = v.videoHeight, scale = Math.min(1, 720 / Math.max(w, h));
+    canvas.width = Math.round(w * scale); canvas.height = Math.round(h * scale);
+    ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+    var img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    var qr = window.jsQR && window.jsQR(img.data, img.width, img.height, { inversionAttempts: "dontInvert" });
+    if (!(qr && found(qr.data))) requestAnimationFrame(tick);
+  }
+
+  /* ---- eventi ---- */
+  $("loginBtn").onclick = login;
+  $("pin").addEventListener("keydown", function (e) { if (e.key === "Enter") login(); });
+  $("logoutBtn").onclick = function () { logout(""); };
+  $("scanBtn").onclick = startCamera;
+  $("stopBtn").onclick = stopCamera;
+  $("checkBtn").onclick = function () { check($("code").value); };
+  $("code").addEventListener("keydown", function (e) { if (e.key === "Enter") check($("code").value); });
+  $("code").addEventListener("input", function () {
+    var t = extractToken($("code").value).slice(0, 8);
+    $("code").value = t.length > 4 ? t.slice(0, 4) + "-" + t.slice(4) : t;
+  });
+  $("redeemBtn").onclick = redeemTap;
+  $("againBtn").onclick = function () { current = null; $("code").value = ""; show("scanView"); };
+
+  if (pin) show("scanView"); else show("loginView");
+})();
+</script>
+</body>
+</html>

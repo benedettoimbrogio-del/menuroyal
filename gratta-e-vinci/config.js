@@ -48,7 +48,7 @@ window.CONFIG = {
      il SERVER (tabella public.prizes, estrazione a urna sulle scorte annuali). */
   prizes: [
     { id: "iphone",      label: "iPhone 18",        description: "Hai vinto un iPhone 18!",                isJackpot: true },
-    { id: "playstation", label: "PlayStation",      description: "Hai vinto una PlayStation!",             isJackpot: true },
+    { id: "playstation", label: "PlayStation 5",      description: "Hai vinto una PlayStation 5!",             isJackpot: true },
     { id: "pizza",       label: "Pizza gratis",     description: "Una pizza omaggio a scelta dal menù.",   isJackpot: false },
     { id: "buono10",     label: "Buono da 10 €",    description: "Un buono da 10 € sul prossimo ordine.",  isJackpot: false },
     { id: "bibita",      label: "Bibita omaggio",   description: "Una bibita omaggio sul prossimo ordine.", isJackpot: false },

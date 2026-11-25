@@ -12,7 +12,7 @@ window.CONFIG = {
   localeName: "Royal Randazzo",
   tagline: "Ristorante · Pizzeria · Randazzo",
   title: "Gratta e Vinci",
-  subtitle: "Un biglietto con ogni pizza",
+  subtitle: "Un biglietto ogni 15 € di spesa",
   logoUrl: "assets/logo_royal.png",
   codePrefix: "RYL",
 
@@ -23,15 +23,15 @@ window.CONFIG = {
   supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZ2djenl6dm1scHVlY2ZmcWxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTczNTEsImV4cCI6MjExMTEzMzM1MX0.3RuIbrtCcyClLzLpAz8fjD3xJx03m93GLLp9u2Lalfk",
 
   colors: {
-    background: "#12070a",
-    backgroundAlt: "#1c0b10",
-    burgundy: "#6b1220",
-    burgundyLight: "#8e1c2e",
-    gold: "#d4af37",
-    goldSoft: "#f0d78c",
-    cream: "#f6e7c8",
-    creamDim: "#cbb98a",
-    card: "#18090d"
+    background: "#FEF8EC",
+    backgroundAlt: "#FCF5E5",
+    burgundy: "#4A2C14",
+    burgundyLight: "#6B4A2A",
+    gold: "#C9A227",
+    goldSoft: "#F3D58A",
+    cream: "#4A2C14",
+    creamDim: "#6B4A2A",
+    card: "#FCF5E5"
   },
 
   /* Soglia di raschiatura (0–1): oltre questo valore il resto si scopre da solo.
@@ -49,10 +49,12 @@ window.CONFIG = {
      il SERVER (tabella public.prizes, estrazione a urna sulle scorte annuali). */
   prizes: [
     { id: "iphone",      label: "iPhone 18",        description: "Hai vinto un iPhone 18!",                isJackpot: true },
-    /* 3 PlayStation 5 a rilascio scaglionato (gen/mag/set 2027): id diversi, stessa icona */
+    /* 2 PlayStation 5 a rilascio scaglionato (gen/set 2027): id diversi, stessa icona. ps5_mag disattivata dal 25/11/2026 (schema 50.000) */
     { id: "playstation", label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
-    { id: "ps5_mag",     label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
     { id: "ps5_set",     label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
+    { id: "maschera", label: "Maschera viso Shark", description: "Hai vinto una maschera viso Shark! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "maschera" },
+    { id: "spa", label: "Spa", description: "Hai vinto un ingresso alla Spa! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "spa" },
+    { id: "tv60", label: "TV 60 pollici", description: "Hai vinto una TV da 60 pollici! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "tv" },
     { id: "pizza",       label: "Pizza gratis",     description: "Una pizza omaggio a scelta dal menù.",   isJackpot: false },
     { id: "buono10",     label: "Buono da 10 €",    description: "Hai vinto un buono da 10 €! Valido dal lunedì al venerdì. Mostra questa schermata al locale.", isJackpot: false },
     { id: "buono5",      label: "Buono da 5 €",     description: "Hai vinto un buono da 5 € da usare al tuo prossimo ordine! Mostra questa schermata al locale.", isJackpot: false, icon: "buono5" },
@@ -63,6 +65,6 @@ window.CONFIG = {
     { id: "petali", label: "Petali di patate omaggio", description: "Petali di patate omaggio sul prossimo ordine.", isJackpot: false, icon: "petali" },
     { id: "spirale", label: "Spirali di patate omaggio", description: "Spirali di patate omaggio sul prossimo ordine.", isJackpot: false, icon: "spirale" },
     { id: "arancinetti", label: "Arancinetti omaggio", description: "Arancinetti omaggio sul prossimo ordine.", isJackpot: false, icon: "arancinetti" },
-    { id: "ritenta",     label: "Ritenta",          description: "Non hai vinto questa volta. Ritenta con la prossima pizza!", isJackpot: false, isLosing: true }
+    { id: "ritenta",     label: "Ritenta",          description: "Non hai vinto questa volta. Ritenta: un biglietto ogni 15 € di spesa!", isJackpot: false, isLosing: true }
   ]
 };

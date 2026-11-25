@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#12070a">
+  <meta name="theme-color" content="#4A2C14">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Gratta e Vinci Royal">
   <title>Gratta e Vinci · Royal Randazzo</title>
@@ -42,16 +42,16 @@
     }
 
     :root {
-      --bg: #12070a;
-      --bg-2: #1c0b10;
-      --burgundy: #6b1220;
-      --burgundy-2: #8e1c2e;
-      --gold: #d4af37;
-      --gold-2: #f0d78c;
-      --cream: #f6e7c8;
-      --cream-dim: #cbb98a;
-      --card: #18090d;
-      --ink: #2a1014;
+      --bg: #FEF8EC;
+      --bg-2: #FCF5E5;
+      --burgundy: #4A2C14;
+      --burgundy-2: #6B4A2A;
+      --gold: #C9A227;
+      --gold-2: #F3D58A;
+      --cream: #4A2C14;
+      --cream-dim: #6B4A2A;
+      --card: #FCF5E5;
+      --ink: #4A2C14;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -321,6 +321,37 @@
       font-size: 15px;
     }
 
+    /* ===== v7 — area di vincita/ritiro in palette brand: fondo crema, testo marrone, dettagli oro ===== */
+    :root { --brand-cream: #FCF5E5; --brand-cream-2: #F8EBCB; --brand-brown: #4A2C14; --brand-brown-soft: #6B4A2A; --brand-gold: #8C6418; }
+    .result-block {
+      background: var(--brand-cream);
+      color: var(--brand-brown);
+      border: 1.5px solid #C9A227;
+      border-radius: 16px;
+      padding: 20px 16px 18px;
+      box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.18), 0 10px 28px rgba(0, 0, 0, 0.35);
+    }
+    .result-block .result-ico { color: var(--brand-gold); }
+    .result-block .result-kicker { color: var(--brand-gold); font-weight: 700; }
+    body.is-jackpot .result-block .result-kicker { color: var(--brand-gold); text-shadow: none; }
+    .result-block .result-title { color: var(--brand-brown); }
+    .result-block .result-desc { color: var(--brand-brown); }
+    .result-block .code-box {
+      background: var(--brand-cream-2);
+      border: 1px solid var(--brand-gold);
+    }
+    .result-block .code-label { color: var(--brand-brown-soft); }
+    .result-block .code-value { color: var(--brand-brown); font-weight: 700; }
+    .result-block .code-meta { color: var(--brand-brown-soft); }
+    .result-block .redeem {
+      background: rgba(168, 122, 36, 0.10);
+      border: 1px solid var(--brand-gold);
+      color: var(--brand-brown);
+    }
+    .result-block .validity { color: var(--brand-brown-soft); }
+    body.is-nowin .result-block .result-title { color: var(--brand-brown); }
+    body.is-nowin .result-block .result-kicker { color: var(--brand-brown-soft); }
+
     footer {
       margin-top: 28px;
       text-align: center;
@@ -450,6 +481,46 @@
       text-align: center;
       color: var(--cream);
     }
+
+    /* ===== v7 — TUTTA la pagina in palette locandina tombola v9/v10 =====
+       crema fondo (254,248,236) #FEF8EC · schede crema (252,245,229) #FCF5E5 · marrone (74,44,20) #4A2C14
+       oro bordi/dettagli (201,162,39) #C9A227 · oro chiaro su fasce scure (243,213,138) #F3D58A */
+    html, body { background: #FEF8EC; }
+    body { color: #4A2C14; background: #FEF8EC; }
+    .header {
+      background: #4A2C14;
+      border: 2px solid #C9A227;
+      border-radius: 16px;
+      padding: 16px 12px 16px;
+      box-shadow: 0 0 0 4px #FEF8EC, 0 0 0 5px rgba(201,162,39,.6);
+    }
+    .logo { filter: drop-shadow(0 3px 8px rgba(0,0,0,.35)); }
+    .locale { color: #F3D58A; text-shadow: 0 2px 0 rgba(0,0,0,.35); }
+    .tagline { color: #F3D58A; opacity: .9; }
+    .rule { background: linear-gradient(90deg, transparent, #C9A227, transparent); }
+    h1 { color: #F3D58A; }
+    .subtitle { color: #FCF5E5; font-size: 18px; }
+    .hint { color: #6B4A2A; }
+    .ticket {
+      background: #FCF5E5;
+      border: 2px solid #C9A227;
+      box-shadow: 0 0 0 4px #FEF8EC, 0 0 0 5px rgba(201,162,39,.55), 0 12px 28px rgba(74,44,20,.18);
+    }
+    .ticket::before { border-color: rgba(201,162,39,.5); }
+    .prize-under { background: radial-gradient(ellipse at 50% 40%, #FFFDF7, #FCF5E5 70%); }
+    .prize-under .ico { color: #C9A227; }
+    .prize-under .kicker { color: #8C6418; font-weight: 700; }
+    .prize-under .pname { color: #4A2C14; }
+    .prize-under .pdesc { color: #6B4A2A; }
+    .status-block {
+      background: #FCF5E5; border: 1.5px solid #C9A227; border-radius: 16px; padding: 20px 16px;
+    }
+    .status-block .result-ico, .status-block .result-kicker { color: #8C6418; }
+    .status-block .result-title { color: #4A2C14; }
+    .status-block .result-desc { color: #4A2C14; }
+    .btn { color: #F3D58A; background: #4A2C14; border: 1px solid #C9A227; }
+    footer { color: #6B4A2A; }
+    footer .loc { color: #8C6418; font-weight: 700; }
   </style>
 </head>
 <body class="is-scratching-phase">
@@ -461,7 +532,7 @@
       <div class="tagline" id="tagline">Ristorante · Pizzeria · Randazzo</div>
       <div class="rule"></div>
       <h1 id="pageTitle">Gratta e Vinci</h1>
-      <p class="subtitle" id="subtitle">Un biglietto con ogni pizza</p>
+      <p class="subtitle" id="subtitle">Un biglietto ogni 15 € di spesa</p>
     </header>
 
     <p class="hint" id="hint">Gratta con il dito (o il mouse) per scoprire il premio.</p>
@@ -530,19 +601,19 @@
       localeName: "Royal Randazzo",
       tagline: "Ristorante · Pizzeria · Randazzo",
       title: "Gratta e Vinci",
-      subtitle: "Un biglietto con ogni pizza",
+      subtitle: "Un biglietto ogni 15 € di spesa",
       logoUrl: "assets/logo_royal.png",
       codePrefix: "RYL",
       colors: {
-        background: "#12070a",
-        backgroundAlt: "#1c0b10",
-        burgundy: "#6b1220",
-        burgundyLight: "#8e1c2e",
-        gold: "#d4af37",
-        goldSoft: "#f0d78c",
-        cream: "#f6e7c8",
-        creamDim: "#cbb98a",
-        card: "#18090d"
+        background: "#FEF8EC",
+        backgroundAlt: "#FCF5E5",
+        burgundy: "#4A2C14",
+        burgundyLight: "#6B4A2A",
+        gold: "#C9A227",
+        goldSoft: "#F3D58A",
+        cream: "#4A2C14",
+        creamDim: "#6B4A2A",
+        card: "#FCF5E5"
       },
       scratchThreshold: 0.55,
       validityText: "Valido sul prossimo ordine entro 30 giorni.",
@@ -550,8 +621,10 @@
       prizes: [
         { id: "iphone", label: "iPhone 18", description: "Hai vinto un iPhone 18!", isJackpot: true },
         { id: "playstation", label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
-        { id: "ps5_mag", label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
         { id: "ps5_set", label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
+        { id: "maschera", label: "Maschera viso Shark", description: "Hai vinto una maschera viso Shark! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "maschera" },
+        { id: "spa", label: "Spa", description: "Hai vinto un ingresso alla Spa! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "spa" },
+        { id: "tv60", label: "TV 60 pollici", description: "Hai vinto una TV da 60 pollici! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "tv" },
         { id: "pizza", label: "Pizza gratis", description: "Una pizza omaggio a scelta dal menù.", isJackpot: false },
         { id: "buono10", label: "Buono da 10 €", description: "Hai vinto un buono da 10 €! Valido dal lunedì al venerdì. Mostra questa schermata al locale.", isJackpot: false },
         { id: "buono5", label: "Buono da 5 €", description: "Hai vinto un buono da 5 € da usare al tuo prossimo ordine! Mostra questa schermata al locale.", isJackpot: false, icon: "buono5" },
@@ -562,7 +635,7 @@
         { id: "petali", label: "Petali di patate omaggio", description: "Petali di patate omaggio sul prossimo ordine.", isJackpot: false, icon: "petali" },
         { id: "spirale", label: "Spirali di patate omaggio", description: "Spirali di patate omaggio sul prossimo ordine.", isJackpot: false, icon: "spirale" },
         { id: "arancinetti", label: "Arancinetti omaggio", description: "Arancinetti omaggio sul prossimo ordine.", isJackpot: false, icon: "arancinetti" },
-        { id: "ritenta", label: "Ritenta", description: "Non hai vinto questa volta. Ritenta con la prossima pizza!", isJackpot: false, isLosing: true }
+        { id: "ritenta", label: "Ritenta", description: "Non hai vinto questa volta. Ritenta: un biglietto ogni 15 € di spesa!", isJackpot: false, isLosing: true }
       ]
     };
   </script>
@@ -582,6 +655,9 @@
     var wantReset = params.get("reset") === "1";
 
     var ICONS = {
+      spa: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M32 14 c-6 6-8 14-6 22 c2 6 4 8 6 8 s4-2 6-8 c2-8 0-16-6-22z"/><path d="M26 36 c-6-2-12-1-16 3 c4 6 12 7 22 5"/><path d="M38 36 c6-2 12-1 16 3 c-4 6-12 7-22 5"/><path d="M14 52 h36"/><path d="M20 57 h24"/></svg>',
+      tv: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="12" width="52" height="32" rx="3"/><rect x="10" y="16" width="44" height="24" rx="1.5"/><path d="M24 52 h16 M32 44 v8"/><text x="32" y="31.5" text-anchor="middle" font-size="9" font-family="Cinzel, serif" fill="currentColor" stroke="none">60"</text></svg>',
+      maschera: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 24 c0-6 6-10 22-10 s22 4 22 10 c0 14-8 26-22 26 S10 38 10 24z"/><path d="M20 28 c3-3 8-3 10 0 M34 28 c2-3 7-3 10 0"/><path d="M26 40 c4 3 8 3 12 0"/><path d="M32 6 v5 M22 8 l2 5 M42 8 l-2 5"/></svg>',
       sconto: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="22" cy="22" r="8"/><circle cx="42" cy="42" r="8"/><path d="M18 46 L46 18"/></svg>',
       bibita: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 h20 l-3 44a8 8 0 0 1-8 0 L22 10z"/><path d="M24 22 h16"/><path d="M40 10 c6 4 8 10 4 16"/></svg>',
       arancinetti: '<svg viewBox="0 0 64 64" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="32" cy="34" rx="16" ry="15"/><path d="M22 28 c4-10 16-10 20 0"/><circle cx="32" cy="34" r="3"/></svg>',
@@ -894,7 +970,7 @@
     /* Nessun ?t= : niente gioco libero */
     if (!tokenRef) {
       showStatus("scan", "Inquadra il QR del tuo foglietto",
-        "Per giocare inquadra con la fotocamera il QR stampato sul foglietto «Gratta e vinci Royal» che ricevi con la pizza. Ogni foglietto vale una sola volta.");
+        "Per giocare inquadra con la fotocamera il QR stampato sul foglietto «Gratta e vinci Royal» che ricevi alla cassa (1 ogni 15 € di spesa). Ogni foglietto vale una sola volta.");
       window.GEV = { CONFIG: CONFIG, status: "scan" };
       return;
     }
@@ -964,11 +1040,11 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.globalCompositeOperation = "source-over";
       var grd = ctx.createLinearGradient(0, 0, w, h);
-      grd.addColorStop(0, "#f4f4f8");
-      grd.addColorStop(0.22, "#b4b4c0");
-      grd.addColorStop(0.48, "#ececf2");
-      grd.addColorStop(0.72, "#9696a4");
-      grd.addColorStop(1, "#d2d2dc");
+      grd.addColorStop(0, "#F8E7AE");
+      grd.addColorStop(0.22, "#C9A227");
+      grd.addColorStop(0.48, "#F3D58A");
+      grd.addColorStop(0.72, "#B08A1E");
+      grd.addColorStop(1, "#E6C766");
       ctx.fillStyle = grd;
       ctx.fillRect(0, 0, w, h);
 
@@ -982,7 +1058,7 @@
         ctx.stroke();
       }
       ctx.globalAlpha = 0.1;
-      ctx.strokeStyle = "#4a2030";
+      ctx.strokeStyle = "#4A2C14";
       for (var j = -h; j < w + h; j += 6) {
         ctx.beginPath();
         ctx.moveTo(j, h);
@@ -993,17 +1069,17 @@
       ctx.globalAlpha = 1;
       var vg = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.15, w / 2, h / 2, Math.max(w, h) * 0.7);
       vg.addColorStop(0, "rgba(0,0,0,0)");
-      vg.addColorStop(1, "rgba(40,16,24,0.28)");
+      vg.addColorStop(1, "rgba(74,44,20,0.22)");
       ctx.fillStyle = vg;
       ctx.fillRect(0, 0, w, h);
 
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "#5a1220";
+      ctx.fillStyle = "#4A2C14";
       ctx.font = "600 28px Cinzel, Palatino, serif";
       ctx.fillText("GRATTA QUI", w / 2, h / 2 - 10);
       ctx.font = "italic 17px 'EB Garamond', Palatino, serif";
-      ctx.fillStyle = "rgba(58,12,20,0.85)";
+      ctx.fillStyle = "rgba(74,44,20,0.88)";
       ctx.fillText("scopri il premio", w / 2, h / 2 + 22);
       ctx.restore();
     }

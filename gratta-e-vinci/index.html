@@ -349,6 +349,14 @@
       color: var(--brand-brown);
     }
     .result-block .validity { color: var(--brand-brown-soft); }
+    /* QR per il ritiro alla cassa (scansionato dalla pagina staff) */
+    .prize-qr { margin: 14px auto 6px; text-align: center; }
+    .prize-qr img { width: 240px; height: 240px; max-width: 72vw; max-height: 72vw; display: block; margin: 0 auto;
+                    background: #fff; border: 4px solid #d4af37; border-radius: 14px; padding: 6px; image-rendering: pixelated;
+                    box-shadow: 0 2px 0 #8C6418; }
+    .prize-qr .qr-cap { margin-top: 8px; font-weight: 700; color: var(--brand-brown); font-size: 1rem; line-height: 1.3; }
+    .prize-redeemed { margin: 14px auto 6px; padding: 12px 14px; border-radius: 12px; background: #A01E1E; color: #fff;
+                      font-weight: 700; font-size: 1.1rem; line-height: 1.3; max-width: 320px; }
     body.is-nowin .result-block .result-title { color: var(--brand-brown); }
     body.is-nowin .result-block .result-kicker { color: var(--brand-brown-soft); }
 
@@ -627,6 +635,11 @@
       <div class="result-kicker" id="resultKicker">Hai vinto</div>
       <h2 class="result-title" id="resultTitle"></h2>
       <p class="result-desc" id="resultDesc"></p>
+      <div class="prize-qr" id="prizeQr" hidden>
+        <img id="prizeQrImg" alt="QR del premio da mostrare al cameriere">
+        <div class="qr-cap">Mostra questo QR al cameriere per ritirare il premio</div>
+      </div>
+      <div class="prize-redeemed" id="prizeRedeemed" hidden></div>
       <div class="code-box">
         <div class="code-label">Codice premio</div>
         <div class="code-value" id="resultCode"></div>
@@ -730,6 +743,7 @@
     };
   </script>
   <script src="config.js"></script>
+  <script src="vendor/qrcode-generator.js"></script>
   <script>
   (function () {
     "use strict";
@@ -1358,6 +1372,7 @@
         prizeId: res.prize,
         code: (CONFIG.codePrefix || "RYL") + "-" + res.code.slice(0, 4) + "-" + res.code.slice(4),
         issuedAt: res.claimed_at,
+        redeemedAt: res.redeemed_at || null,
         token: res.code,
         revealed: false
       };
@@ -1419,9 +1434,32 @@
       document.getElementById("redeemText").textContent = noWin ? "" : (CONFIG.redeemText || "");
       document.getElementById("validityText").textContent = noWin ? "" :
         (prize.isJackpot ? (CONFIG.jackpotText || CONFIG.validityText || "") : (CONFIG.validityText || ""));
+      renderPrizeQr(noWin);
       if (isIphonePrize(prize)) startIphoneCelebration();
       else if (prize.isJackpot) startConfetti();
       if (opts.playSound && !soundPlayed) playResultSound();
+    }
+
+    /* QR per il ritiro: stesso contenuto del QR stampato (URL del gioco + ?t=TOKEN).
+       Se lo staff ha già segnato il premio come ritirato, al posto del QR compare la data del ritiro. */
+    function renderPrizeQr(noWin) {
+      var box = document.getElementById("prizeQr"), img = document.getElementById("prizeQrImg");
+      var done = document.getElementById("prizeRedeemed");
+      box.hidden = true; done.hidden = true;
+      if (noWin || !state.token) return;
+      if (state.redeemedAt) {
+        done.textContent = "Premio già ritirato il " + formatWhen(state.redeemedAt);
+        done.hidden = false;
+        document.getElementById("redeemText").hidden = true;
+        return;
+      }
+      if (!window.qrcode) return;
+      var base = CONFIG.qrBaseUrl || "https://benedettoimbrogio-del.github.io/menuroyal/gratta-e-vinci/";
+      var content = base + "?t=" + state.token;
+      var q = window.qrcode(0, "M"); q.addData(content); q.make();
+      img.src = q.createDataURL(8, 4);
+      img.setAttribute("data-content", content);
+      box.hidden = false;
     }
 
     /* ---------- Scratch canvas ---------- */

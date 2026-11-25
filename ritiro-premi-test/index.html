@@ -51,6 +51,10 @@
   .prize .value { display:inline-block; margin-top:8px; background:var(--gold); color:var(--brown); border-radius:999px; padding:3px 14px; font-weight:700; }
   dl { display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:17px; margin:12px 0 0; }
   dt { color:var(--brown2); } dd { margin:0; font-weight:600; }
+  .ticketqr { text-align:center; margin:12px auto 0; }
+  .ticketqr img { width:240px; height:240px; max-width:80vw; max-height:80vw; image-rendering:pixelated; background:#fff;
+                  border:3px solid var(--gold); border-radius:12px; padding:6px; display:block; margin:0 auto; }
+  .ticketqr .cap { font-size:15px; color:var(--brown2); margin-top:6px; }
   .reminder { background:var(--cream); border:2px dashed var(--gold2); border-radius:12px; padding:10px 12px; font-size:17px; margin-top:12px; text-align:center; }
   .test { display:inline-block; background:#2B5DA8; color:#fff; border-radius:8px; padding:2px 10px; font-size:14px; font-weight:700; letter-spacing:.06em; }
   .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size:22px; letter-spacing:.08em; }
@@ -95,6 +99,7 @@
     <div id="status" class="status"><div class="big"></div><div class="sub"></div></div>
     <div style="text-align:center"><span class="code" id="rCode"></span> <span id="rTest" class="test hidden">TEST</span></div>
     <div id="rPrize" class="prize hidden"><div class="label"></div><div class="desc"></div><div class="value hidden"></div></div>
+    <div id="rQr" class="ticketqr hidden"><img id="rQrImg" alt="QR del biglietto"><div class="cap">QR del biglietto (lo stesso stampato sul foglietto)</div></div>
     <dl>
       <dt>Grattato</dt><dd id="rScratched">—</dd>
       <dt>Ritirato</dt><dd id="rRedeemed">—</dd>
@@ -114,6 +119,7 @@
 
 <script src="config.js"></script>
 <script src="vendor/jsQR.js"></script>
+<script src="vendor/qrcode-generator.js"></script>
 <script>
 (function () {
   "use strict";
@@ -224,6 +230,7 @@
     var hasNote = !!r.redeemed_note;
     $("rNoteT").classList.toggle("hidden", !hasNote); $("rNote").classList.toggle("hidden", !hasNote);
     $("rNote").textContent = r.redeemed_note || "";
+    renderTicketQr(r.status !== "invalid" ? (r.code || token) : null);
     var canRedeem = false;
     if (r.status === "invalid") setStatus("s-bad", "✗ CODICE NON VALIDO", "Questo codice non esiste. Non consegnare nulla.");
     else if (!r.scratched) setStatus("s-grey", "NON ANCORA GRATTATO", "Il cliente deve prima grattarlo inquadrando il QR col suo telefono.");
@@ -235,6 +242,20 @@
     $("redeemBox").classList.toggle("hidden", !canRedeem);
     $("reminder").classList.toggle("hidden", !(r.status !== "invalid" && r.scratched && r.win));
     show("resultView");
+  }
+
+  /* ---- QR del biglietto: stesso contenuto del foglietto stampato (URL del gioco + ?t=TOKEN) ---- */
+  var GAME_URL = CFG.gameUrl || "https://benedettoimbrogio-del.github.io/menuroyal/gratta-e-vinci/";
+  function renderTicketQr(token) {
+    var box = $("rQr"), img = $("rQrImg");
+    if (!token || !/^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$/.test(token) || !window.qrcode) {
+      box.classList.add("hidden"); img.removeAttribute("src"); img.removeAttribute("data-content"); return;
+    }
+    var content = GAME_URL + "?t=" + token;
+    var q = window.qrcode(0, "M"); q.addData(content); q.make();
+    img.src = q.createDataURL(8, 4);
+    img.setAttribute("data-content", content);
+    box.classList.remove("hidden");
   }
 
   /* ---- ritiro: doppio tocco di conferma ---- */

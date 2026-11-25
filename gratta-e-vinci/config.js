@@ -54,9 +54,15 @@ window.CONFIG = {
     { id: "ps5_mag",     label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
     { id: "ps5_set",     label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
     { id: "pizza",       label: "Pizza gratis",     description: "Una pizza omaggio a scelta dal menù.",   isJackpot: false },
-    { id: "buono10",     label: "Buono da 10 €",    description: "Un buono da 10 € sul prossimo ordine.",  isJackpot: false },
-    { id: "bibita",      label: "Bibita omaggio",   description: "Una bibita omaggio sul prossimo ordine.", isJackpot: false },
+    { id: "buono10",     label: "Buono da 10 €",    description: "Hai vinto un buono da 10 €! Valido dal lunedì al venerdì. Mostra questa schermata al locale.", isJackpot: false },
+    { id: "buono5",      label: "Buono da 5 €",     description: "Hai vinto un buono da 5 € da usare al tuo prossimo ordine! Mostra questa schermata al locale.", isJackpot: false, icon: "buono5" },
+    { id: "bibita",      label: "Bibita analcolica omaggio", description: "Una bibita analcolica omaggio sul prossimo ordine.", isJackpot: false },
     { id: "patatine",    label: "Patatine omaggio", description: "Patatine omaggio sul prossimo ordine.",  isJackpot: false },
+    { id: "crocchette", label: "Crocchette di patate omaggio", description: "Crocchette di patate omaggio sul prossimo ordine.", isJackpot: false, icon: "crocchette" },
+    { id: "bocconcini", label: "Bocconcini di pollo omaggio", description: "Bocconcini di pollo omaggio sul prossimo ordine.", isJackpot: false, icon: "bocconcini" },
+    { id: "petali", label: "Petali di patate omaggio", description: "Petali di patate omaggio sul prossimo ordine.", isJackpot: false, icon: "petali" },
+    { id: "spirale", label: "Spirali di patate omaggio", description: "Spirali di patate omaggio sul prossimo ordine.", isJackpot: false, icon: "spirale" },
+    { id: "arancinetti", label: "Arancinetti omaggio", description: "Arancinetti omaggio sul prossimo ordine.", isJackpot: false, icon: "arancinetti" },
     { id: "ritenta",     label: "Ritenta",          description: "Non hai vinto questa volta. Ritenta con la prossima pizza!", isJackpot: false, isLosing: true }
   ]
 };

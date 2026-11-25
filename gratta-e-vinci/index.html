@@ -671,15 +671,15 @@
     </footer>
   </div>
 
-  <audio id="sfxWin" preload="auto" playsinline>
+  <audio id="sfxWin" preload="auto" playsinline webkit-playsinline="true">
     <source src="assets/audio/vincita.mp3" type="audio/mpeg">
     <source src="assets/audio/vincita.ogg" type="audio/ogg">
   </audio>
-  <audio id="sfxLose" preload="auto" playsinline>
+  <audio id="sfxLose" preload="auto" playsinline webkit-playsinline="true">
     <source src="assets/audio/ritenta.mp3" type="audio/mpeg">
     <source src="assets/audio/ritenta.ogg" type="audio/ogg">
   </audio>
-  <audio id="sfxIphone" preload="auto" playsinline>
+  <audio id="sfxIphone" preload="auto" playsinline webkit-playsinline="true">
     <source src="assets/audio/jackpot_iphone.mp3" type="audio/mpeg">
     <source src="assets/audio/jackpot_iphone.ogg" type="audio/ogg">
   </audio>
@@ -888,20 +888,40 @@
       return id === "iphone" || id.indexOf("iphone") !== -1 || label.indexOf("iphone") !== -1;
     }
 
-    /* ---------- Audio: sblocco al primo tocco, riproduzione alla rivelazione ---------- */
+
+    /* ---------- Audio v8b: AudioContext + sblocco su gesto reale (Android/iOS) ---------- */
     var MUTE_KEY = "royal-gev-mute";
     var audioMuted = false;
     try { audioMuted = localStorage.getItem(MUTE_KEY) === "1"; } catch (eMute) {}
     var audioUnlocked = false;
     var sfx = { win: null, lose: null, iphone: null };
     var lastSound = null;
+    var soundPlayed = false;
+    var pendingResultSound = false;
+    var audioCtx = null;
+    var masterGain = null;
+    var activeSource = null;
+    var rawBuffers = { win: null, lose: null, iphone: null };
+    var decodedBuffers = { win: null, lose: null, iphone: null };
+    var audioUrls = {
+      win: "assets/audio/vincita.mp3",
+      lose: "assets/audio/ritenta.mp3",
+      iphone: "assets/audio/jackpot_iphone.mp3"
+    };
 
     function allSfx() { return [sfx.win, sfx.lose, sfx.iphone].filter(Boolean); }
+    function markGev(key, val) { if (window.GEV) window.GEV[key] = val; }
+
     function stopAllSfx() {
+      if (activeSource) {
+        try { activeSource.stop(0); } catch (eStop) {}
+        activeSource = null;
+      }
       allSfx().forEach(function (a) {
-        try { a.pause(); a.currentTime = 0; } catch (eStop) {}
+        try { a.pause(); a.currentTime = 0; } catch (eStop2) {}
       });
     }
+
     function applyMuteUI() {
       var btn = document.getElementById("muteBtn");
       if (!btn) return;
@@ -909,67 +929,247 @@
       btn.setAttribute("aria-pressed", audioMuted ? "true" : "false");
       btn.setAttribute("aria-label", audioMuted ? "Attiva suoni" : "Disattiva suoni");
       btn.title = audioMuted ? "Attiva suoni" : "Disattiva suoni";
-      allSfx().forEach(function (a) { a.muted = audioMuted; });
+      allSfx().forEach(function (a) { a.muted = audioMuted; a.volume = 1; });
+      if (masterGain) masterGain.gain.value = audioMuted ? 0 : 1;
       if (audioMuted) stopAllSfx();
     }
+
     function setMuted(on) {
       audioMuted = !!on;
       try { localStorage.setItem(MUTE_KEY, audioMuted ? "1" : "0"); } catch (eSet) {}
       applyMuteUI();
     }
+
+    function getAudioCtx() {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      if (!audioCtx) {
+        try {
+          audioCtx = new AC();
+          masterGain = audioCtx.createGain();
+          masterGain.gain.value = audioMuted ? 0 : 1;
+          masterGain.connect(audioCtx.destination);
+        } catch (eCtx) {
+          audioCtx = null;
+          return null;
+        }
+      }
+      return audioCtx;
+    }
+
+    function tickSilent(ctx) {
+      try {
+        var buf = ctx.createBuffer(1, Math.max(1, Math.floor((ctx.sampleRate || 22050) * 0.03)), ctx.sampleRate || 22050);
+        var src = ctx.createBufferSource();
+        src.buffer = buf;
+        src.connect(ctx.destination);
+        src.start(0);
+      } catch (eTick) {}
+    }
+
+    function decodeKind(kind) {
+      var ctx = getAudioCtx();
+      if (!ctx || !rawBuffers[kind] || decodedBuffers[kind]) {
+        return Promise.resolve(decodedBuffers[kind] || null);
+      }
+      var copy = rawBuffers[kind].slice(0);
+      try {
+        var p = ctx.decodeAudioData(copy);
+        if (p && p.then) {
+          return p.then(function (buf) { decodedBuffers[kind] = buf; return buf; }).catch(function () { return null; });
+        }
+      } catch (eDec) {}
+      return new Promise(function (resolve) {
+        try {
+          ctx.decodeAudioData(copy, function (buf) { decodedBuffers[kind] = buf; resolve(buf); }, function () { resolve(null); });
+        } catch (e2) { resolve(null); }
+      });
+    }
+
+    function preloadAudioFiles() {
+      Object.keys(audioUrls).forEach(function (kind) {
+        if (rawBuffers[kind]) return;
+        fetch(audioUrls[kind], { cache: "force-cache" }).then(function (res) {
+          if (!res.ok) throw new Error("audio " + res.status);
+          return res.arrayBuffer();
+        }).then(function (ab) {
+          rawBuffers[kind] = ab;
+          return decodeKind(kind);
+        }).catch(function () {});
+      });
+      allSfx().forEach(function (a) { try { a.load(); } catch (eLoad) {} });
+    }
+
     function unlockAudio() {
-      if (audioUnlocked) return;
-      audioUnlocked = true;
+      var ctx = getAudioCtx();
+      if (ctx) {
+        try {
+          var rp = ctx.resume();
+          if (rp && rp.catch) rp.catch(function () {});
+        } catch (eRes) {}
+        tickSilent(ctx);
+        Object.keys(audioUrls).forEach(function (k) { decodeKind(k); });
+      }
+      /* Su iOS un play() in muto spesso NON sblocca la riproduzione a volume pieno.
+         Prime a volume bassissimo, nello stesso gesto, poi ripristina. */
       allSfx().forEach(function (a) {
         try {
-          a.muted = true;
+          a.muted = false;
+          a.volume = 0.01;
           var p = a.play();
           var restore = function () {
-            try { a.pause(); a.currentTime = 0; } catch (eRst) {}
+            try { a.pause(); if (a.readyState >= 1) a.currentTime = 0; } catch (eRst) {}
+            a.volume = 1;
             a.muted = audioMuted;
           };
-          if (p && p.then) p.then(restore).catch(restore);
+          if (p && p.then) p.then(restore).catch(function () {
+            try {
+              a.muted = true;
+              var p2 = a.play();
+              if (p2 && p2.then) p2.then(restore).catch(restore);
+              else restore();
+            } catch (e2) { restore(); }
+          });
           else restore();
         } catch (eUnl) {}
       });
-      if (window.GEV) window.GEV.audioUnlocked = true;
+      audioUnlocked = true;
+      markGev("audioUnlocked", true);
+      markGev("ctxState", ctx ? ctx.state : null);
     }
-    function playResultSound() {
-      var kind = isIphonePrize(prize) ? "iphone" : (isNoWin(prize) ? "lose" : "win");
-      lastSound = kind;
-      if (window.GEV) window.GEV.lastSound = kind;
-      if (audioMuted) {
-        if (window.GEV) window.GEV.soundPlayOk = "muted";
-        return;
+
+    function soundKindForPrize(p) {
+      if (isIphonePrize(p)) return "iphone";
+      if (isNoWin(p)) return "lose";
+      return "win";
+    }
+
+    function playViaWebAudio(kind) {
+      var ctx = getAudioCtx();
+      var buf = decodedBuffers[kind];
+      if (!ctx || !buf) return false;
+      try {
+        if (ctx.state === "suspended") {
+          var rp = ctx.resume();
+          if (rp && rp.catch) rp.catch(function () {});
+        }
+        if (activeSource) {
+          try { activeSource.stop(0); } catch (eSt) {}
+          activeSource = null;
+        }
+        var src = ctx.createBufferSource();
+        src.buffer = buf;
+        src.connect(masterGain || ctx.destination);
+        src.start(0);
+        activeSource = src;
+        src.onended = function () { if (activeSource === src) activeSource = null; };
+        markGev("soundPlayOk", true);
+        markGev("audioMode", "webaudio");
+        markGev("ctxState", ctx.state);
+        return true;
+      } catch (ePlay) {
+        return false;
       }
+    }
+
+    function playViaHtmlAudio(kind) {
       var a = sfx[kind];
       if (!a) {
-        if (window.GEV) window.GEV.soundPlayOk = "missing";
-        return;
+        markGev("soundPlayOk", "missing");
+        return Promise.resolve(false);
       }
-      stopAllSfx();
+      allSfx().forEach(function (el) {
+        if (el !== a) { try { el.pause(); } catch (eP) {} }
+      });
       try {
-        a.muted = false;
-        a.currentTime = 0;
+        a.muted = !!audioMuted;
+        a.volume = 1;
+        try { if (a.readyState >= 1) a.currentTime = 0; } catch (eT) {}
         var p = a.play();
         if (p && p.then) {
-          p.then(function () {
-            if (window.GEV) window.GEV.soundPlayOk = true;
+          return p.then(function () {
+            if (window.GEV && window.GEV.soundPlayOk !== true) {
+              markGev("soundPlayOk", audioMuted ? "muted" : true);
+              markGev("audioMode", "htmlaudio");
+            }
+            return true;
           }).catch(function (err) {
-            if (window.GEV) window.GEV.soundPlayOk = String((err && err.name) || err);
+            if (window.GEV && window.GEV.soundPlayOk !== true) {
+              markGev("soundPlayOk", String((err && err.name) || err));
+            }
+            return false;
           });
-        } else if (window.GEV) {
-          window.GEV.soundPlayOk = true;
         }
+        if (window.GEV && window.GEV.soundPlayOk !== true) {
+          markGev("soundPlayOk", audioMuted ? "muted" : true);
+          markGev("audioMode", "htmlaudio");
+        }
+        return Promise.resolve(true);
       } catch (err) {
-        if (window.GEV) window.GEV.soundPlayOk = String((err && err.name) || err);
+        if (window.GEV && window.GEV.soundPlayOk !== true) {
+          markGev("soundPlayOk", String((err && err.name) || err));
+        }
+        return Promise.resolve(false);
       }
     }
+
+    function playResultSound() {
+      if (!prize || !prize.id) {
+        pendingResultSound = true;
+        return;
+      }
+      var kind = soundKindForPrize(prize);
+      lastSound = kind;
+      markGev("lastSound", kind);
+      if (audioMuted) {
+        soundPlayed = true;
+        pendingResultSound = false;
+        markGev("soundPlayOk", "muted");
+        return;
+      }
+      if (playViaWebAudio(kind)) {
+        soundPlayed = true;
+        pendingResultSound = false;
+        return;
+      }
+      /* Buffer non ancora pronto: HTMLAudio (meglio se siamo ancora in un gesto) e nuova prova WebAudio appena decodificato. */
+      playViaHtmlAudio(kind).then(function (ok) {
+        if (ok) {
+          soundPlayed = true;
+          pendingResultSound = false;
+        }
+      });
+      var afterDecode = function (buf) {
+        if (buf && lastSound === kind && !audioMuted && !activeSource) {
+          if (playViaWebAudio(kind)) {
+            soundPlayed = true;
+            pendingResultSound = false;
+          }
+        }
+      };
+      if (rawBuffers[kind] && !decodedBuffers[kind]) {
+        decodeKind(kind).then(afterDecode);
+      } else if (!rawBuffers[kind]) {
+        fetch(audioUrls[kind]).then(function (r) { return r.arrayBuffer(); }).then(function (ab) {
+          rawBuffers[kind] = ab;
+          return decodeKind(kind);
+        }).then(afterDecode).catch(function () {});
+      }
+      /* Se HTMLAudio fallisce (tipico su iOS dopo una fetch), resta pending: il prossimo tocco lo riprova. */
+      pendingResultSound = !soundPlayed;
+    }
+
+    function playIfPending() {
+      unlockAudio();
+      if (pendingResultSound) playResultSound();
+    }
+
     function initAudio() {
       sfx.win = document.getElementById("sfxWin");
       sfx.lose = document.getElementById("sfxLose");
       sfx.iphone = document.getElementById("sfxIphone");
       applyMuteUI();
+      preloadAudioFiles();
       var btn = document.getElementById("muteBtn");
       if (btn) {
         btn.addEventListener("click", function () {
@@ -977,13 +1177,15 @@
           setMuted(!audioMuted);
         });
       }
-      var unlockOnce = function () { unlockAudio(); };
-      document.addEventListener("pointerdown", unlockOnce, { capture: true });
-      document.addEventListener("touchstart", unlockOnce, { capture: true, passive: true });
-      document.addEventListener("keydown", unlockOnce, { capture: true });
+      /* touchstart da solo non basta su molti telefoni; pointerup/touchend/click sì. */
+      document.addEventListener("pointerdown", function () { unlockAudio(); }, { capture: true, passive: true });
+      document.addEventListener("touchstart", function () { unlockAudio(); }, { capture: true, passive: true });
+      document.addEventListener("keydown", function () { unlockAudio(); }, { capture: true });
+      document.addEventListener("pointerup", playIfPending, { capture: true, passive: true });
+      document.addEventListener("touchend", playIfPending, { capture: true, passive: true });
+      document.addEventListener("click", playIfPending, { capture: true, passive: true });
     }
     initAudio();
-
 
     /* ---------- UI branding ---------- */
     applyColors(CONFIG.colors);
@@ -1219,7 +1421,7 @@
         (prize.isJackpot ? (CONFIG.jackpotText || CONFIG.validityText || "") : (CONFIG.validityText || ""));
       if (isIphonePrize(prize)) startIphoneCelebration();
       else if (prize.isJackpot) startConfetti();
-      if (opts.playSound) playResultSound();
+      if (opts.playSound && !soundPlayed) playResultSound();
     }
 
     /* ---------- Scratch canvas ---------- */
@@ -1383,10 +1585,14 @@
     function finishReveal() {
       if (revealed) return;
       revealed = true;
+      pendingResultSound = true;
+      /* Se il premio è già arrivato, suona durante la grattata (dito ancora sul biglietto). */
+      if (prize && prize.id && claimed) playResultSound();
       (claimPromise || startClaim()).then(function (ok) {
         if (!ok) return;
         state.revealed = true;
-        autoReveal(function () { showResult({ playSound: true }); });
+        if (!soundPlayed) playResultSound();
+        autoReveal(function () { showResult({ playSound: !soundPlayed }); });
       });
     }
 
@@ -1409,7 +1615,11 @@
       lastX = p.x; lastY = p.y;
       if (scratchedPercent() >= threshold) finishReveal();
     }
-    function onEnd() { scratching = false; }
+    function onEnd() {
+      scratching = false;
+      unlockAudio();
+      if (pendingResultSound) playResultSound();
+    }
 
     canvas.addEventListener("mousedown", onStart);
     window.addEventListener("mousemove", onMove);
@@ -1585,7 +1795,9 @@
       setMuted: setMuted,
       isIphonePrize: isIphonePrize,
       lastSound: lastSound,
-      audioUnlocked: audioUnlocked
+      audioUnlocked: audioUnlocked,
+      ctxState: audioCtx ? audioCtx.state : null,
+      audioMode: null
     };
 
     function startScratch() {

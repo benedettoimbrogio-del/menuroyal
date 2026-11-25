@@ -549,7 +549,9 @@
       redeemText: "Mostra questa schermata alla cassa, oppure fai uno screenshot.",
       prizes: [
         { id: "iphone", label: "iPhone 18", description: "Hai vinto un iPhone 18!", isJackpot: true },
-        { id: "playstation", label: "PlayStation 5", description: "Hai vinto una PlayStation 5!", isJackpot: true },
+        { id: "playstation", label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
+        { id: "ps5_mag", label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
+        { id: "ps5_set", label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
         { id: "pizza", label: "Pizza gratis", description: "Una pizza omaggio a scelta dal menù.", isJackpot: false },
         { id: "buono10", label: "Buono da 10 €", description: "Un buono da 10 € sul prossimo ordine.", isJackpot: false },
         { id: "bibita", label: "Bibita omaggio", description: "Una bibita omaggio sul prossimo ordine.", isJackpot: false },
@@ -868,6 +870,7 @@
         description: res.prize_description || base.description || "",
         isJackpot: !!res.is_jackpot,
         isLosing: res.win === false,
+        icon: res.icon || base.icon || res.prize,
         tier: res.tier || null
       };
     }
@@ -907,7 +910,7 @@
       }
       var kick = isNoWin(prize) ? "Non hai vinto" : (prize.isJackpot ? "Jackpot" : "Hai vinto");
       el.innerHTML =
-        '<div class="ico">' + iconSvg(prize.id) + "</div>" +
+        '<div class="ico">' + iconSvg(prize.icon || prize.id) + "</div>" +
         '<div class="kicker">' + kick + "</div>" +
         '<div class="pname">' + escapeHtml(prize.label) + "</div>" +
         '<div class="pdesc">' + escapeHtml(prize.description || "") + "</div>";
@@ -921,7 +924,7 @@
       if (isNoWin(prize)) document.body.classList.add("is-nowin");
       var block = document.getElementById("resultBlock");
       block.hidden = false;
-      document.getElementById("resultIco").innerHTML = iconSvg(prize.id);
+      document.getElementById("resultIco").innerHTML = iconSvg(prize.icon || prize.id);
       document.getElementById("resultKicker").textContent =
         isNoWin(prize) ? "Non hai vinto" : (prize.isJackpot ? "Jackpot" : "Hai vinto");
       document.getElementById("resultTitle").textContent = prize.label;

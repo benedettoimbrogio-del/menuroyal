@@ -44,11 +44,15 @@ window.CONFIG = {
   /* Testo per iPhone / PlayStation (al posto di validityText). */
   jackpotText: "Per il ritiro del premio rivolgiti al locale mostrando questa schermata.",
 
-  /* SOLO etichette, descrizioni e icone di riserva. NESSUN peso: il premio lo decide
+  /* "icon" = id dell'icona (il server la manda già nel campo icon; questo è il ripiego).
+     SOLO etichette, descrizioni e icone di riserva. NESSUN peso: il premio lo decide
      il SERVER (tabella public.prizes, estrazione a urna sulle scorte annuali). */
   prizes: [
     { id: "iphone",      label: "iPhone 18",        description: "Hai vinto un iPhone 18!",                isJackpot: true },
-    { id: "playstation", label: "PlayStation 5",      description: "Hai vinto una PlayStation 5!",             isJackpot: true },
+    /* 3 PlayStation 5 a rilascio scaglionato (gen/mag/set 2027): id diversi, stessa icona */
+    { id: "playstation", label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
+    { id: "ps5_mag",     label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
+    { id: "ps5_set",     label: "PlayStation 5", description: "Hai vinto una PlayStation 5! Mostra questa schermata al locale per il ritiro.", isJackpot: true, icon: "playstation" },
     { id: "pizza",       label: "Pizza gratis",     description: "Una pizza omaggio a scelta dal menù.",   isJackpot: false },
     { id: "buono10",     label: "Buono da 10 €",    description: "Un buono da 10 € sul prossimo ordine.",  isJackpot: false },
     { id: "bibita",      label: "Bibita omaggio",   description: "Una bibita omaggio sul prossimo ordine.", isJackpot: false },

@@ -521,12 +521,89 @@
     .btn { color: #F3D58A; background: #4A2C14; border: 1px solid #C9A227; }
     footer { color: #6B4A2A; }
     footer .loc { color: #8C6418; font-weight: 700; }
+
+    /* ===== v8 — pulsante muto e celebrazione iPhone (palette tombola) ===== */
+    .header { position: relative; }
+    .mute-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: 50%;
+      background: #FCF5E5;
+      border: 1.5px solid #C9A227;
+      color: #4A2C14;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 2px 6px rgba(74, 44, 20, 0.18);
+      z-index: 5;
+    }
+    .mute-btn:focus-visible {
+      outline: 2px solid #C9A227;
+      outline-offset: 2px;
+    }
+    .mute-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .mute-btn .ico-muted { display: none; }
+    .mute-btn.is-muted .ico-on { display: none; }
+    .mute-btn.is-muted .ico-muted { display: block; }
+    .mute-btn.is-muted { color: #6B4A2A; background: #FEF8EC; }
+
+    #iphoneGlow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 19;
+      opacity: 0;
+      background: radial-gradient(ellipse 70% 55% at 50% 38%, rgba(243,213,138,.42), rgba(201,162,39,.12) 42%, transparent 72%);
+    }
+    body.is-iphone-jackpot #iphoneGlow { animation: iphoneGlowPulse 2.4s ease-in-out 3; }
+    @keyframes iphoneGlowPulse {
+      0%, 100% { opacity: 0; }
+      40% { opacity: 1; }
+      70% { opacity: .55; }
+    }
+    body.is-iphone-jackpot .result-block {
+      animation: iphoneCardIn .9s cubic-bezier(.22, 1.15, .36, 1) both;
+      box-shadow: 0 0 0 4px #FEF8EC, 0 0 0 6px #C9A227, 0 18px 48px rgba(201,162,39,.45), 0 0 36px rgba(243,213,138,.55);
+    }
+    @keyframes iphoneCardIn {
+      0% { transform: scale(.82); opacity: 0; }
+      58% { transform: scale(1.06); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    body.is-iphone-jackpot .result-ico {
+      color: #C9A227;
+      filter: drop-shadow(0 0 12px rgba(243,213,138,.95));
+      animation: iphoneIcoPulse 1.6s ease-in-out .35s 3;
+    }
+    @keyframes iphoneIcoPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+    }
+    body.is-iphone-jackpot .result-block .result-kicker { color: #8C6418; letter-spacing: 0.36em; }
+    body.is-iphone-jackpot .result-block .result-title { text-shadow: 0 0 18px rgba(243,213,138,.65); }
+    @media (prefers-reduced-motion: reduce) {
+      body.is-iphone-jackpot #iphoneGlow,
+      body.is-iphone-jackpot .result-block,
+      body.is-iphone-jackpot .result-ico { animation: none; }
+      body.is-iphone-jackpot #iphoneGlow { opacity: .28; }
+      body.is-iphone-jackpot .result-block { transform: none; }
+    }
+
   </style>
 </head>
 <body class="is-scratching-phase">
   <canvas id="confetti" aria-hidden="true"></canvas>
+  <div id="iphoneGlow" aria-hidden="true"></div>
   <div class="wrap">
     <header class="header">
+      <button type="button" class="mute-btn" id="muteBtn" aria-label="Disattiva suoni" title="Disattiva suoni" aria-pressed="false">
+        <svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3.2L12 18V6L7.2 10H4z"/><path d="M16 9.2a4 4 0 0 1 0 5.6"/><path d="M18.2 7a7 7 0 0 1 0 10"/></svg>
+        <svg class="ico-muted" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3.2L12 18V6L7.2 10H4z"/><path d="M16 10l5 5M21 10l-5 5"/></svg>
+      </button>
       <img class="logo" id="logo" alt="Royal Randazzo" src="assets/logo_royal.png">
       <div class="locale" id="localeName">Royal Randazzo</div>
       <div class="tagline" id="tagline">Ristorante · Pizzeria · Randazzo</div>
@@ -593,6 +670,19 @@
       <p>Il premio è estratto dal sistema del locale. Ogni foglietto vale una sola volta e solo sul telefono che lo ha grattato per primo.</p>
     </footer>
   </div>
+
+  <audio id="sfxWin" preload="auto" playsinline>
+    <source src="assets/audio/vincita.mp3" type="audio/mpeg">
+    <source src="assets/audio/vincita.ogg" type="audio/ogg">
+  </audio>
+  <audio id="sfxLose" preload="auto" playsinline>
+    <source src="assets/audio/ritenta.mp3" type="audio/mpeg">
+    <source src="assets/audio/ritenta.ogg" type="audio/ogg">
+  </audio>
+  <audio id="sfxIphone" preload="auto" playsinline>
+    <source src="assets/audio/jackpot_iphone.mp3" type="audio/mpeg">
+    <source src="assets/audio/jackpot_iphone.ogg" type="audio/ogg">
+  </audio>
 
   <noscript>Per usare il Gratta e Vinci devi attivare JavaScript.</noscript>
 
@@ -790,6 +880,110 @@
     function iconSvg(id) { return ICONS[id] || ICONS.bibita; }
 
     function isNoWin(prize) { return !!prize && (prize.isLosing === true || prize.id === "ritenta"); }
+
+    function isIphonePrize(prize) {
+      if (!prize) return false;
+      var id = String(prize.id || "").toLowerCase();
+      var label = String(prize.label || "").toLowerCase();
+      return id === "iphone" || id.indexOf("iphone") !== -1 || label.indexOf("iphone") !== -1;
+    }
+
+    /* ---------- Audio: sblocco al primo tocco, riproduzione alla rivelazione ---------- */
+    var MUTE_KEY = "royal-gev-mute";
+    var audioMuted = false;
+    try { audioMuted = localStorage.getItem(MUTE_KEY) === "1"; } catch (eMute) {}
+    var audioUnlocked = false;
+    var sfx = { win: null, lose: null, iphone: null };
+    var lastSound = null;
+
+    function allSfx() { return [sfx.win, sfx.lose, sfx.iphone].filter(Boolean); }
+    function stopAllSfx() {
+      allSfx().forEach(function (a) {
+        try { a.pause(); a.currentTime = 0; } catch (eStop) {}
+      });
+    }
+    function applyMuteUI() {
+      var btn = document.getElementById("muteBtn");
+      if (!btn) return;
+      btn.classList.toggle("is-muted", audioMuted);
+      btn.setAttribute("aria-pressed", audioMuted ? "true" : "false");
+      btn.setAttribute("aria-label", audioMuted ? "Attiva suoni" : "Disattiva suoni");
+      btn.title = audioMuted ? "Attiva suoni" : "Disattiva suoni";
+      allSfx().forEach(function (a) { a.muted = audioMuted; });
+      if (audioMuted) stopAllSfx();
+    }
+    function setMuted(on) {
+      audioMuted = !!on;
+      try { localStorage.setItem(MUTE_KEY, audioMuted ? "1" : "0"); } catch (eSet) {}
+      applyMuteUI();
+    }
+    function unlockAudio() {
+      if (audioUnlocked) return;
+      audioUnlocked = true;
+      allSfx().forEach(function (a) {
+        try {
+          a.muted = true;
+          var p = a.play();
+          var restore = function () {
+            try { a.pause(); a.currentTime = 0; } catch (eRst) {}
+            a.muted = audioMuted;
+          };
+          if (p && p.then) p.then(restore).catch(restore);
+          else restore();
+        } catch (eUnl) {}
+      });
+      if (window.GEV) window.GEV.audioUnlocked = true;
+    }
+    function playResultSound() {
+      var kind = isIphonePrize(prize) ? "iphone" : (isNoWin(prize) ? "lose" : "win");
+      lastSound = kind;
+      if (window.GEV) window.GEV.lastSound = kind;
+      if (audioMuted) {
+        if (window.GEV) window.GEV.soundPlayOk = "muted";
+        return;
+      }
+      var a = sfx[kind];
+      if (!a) {
+        if (window.GEV) window.GEV.soundPlayOk = "missing";
+        return;
+      }
+      stopAllSfx();
+      try {
+        a.muted = false;
+        a.currentTime = 0;
+        var p = a.play();
+        if (p && p.then) {
+          p.then(function () {
+            if (window.GEV) window.GEV.soundPlayOk = true;
+          }).catch(function (err) {
+            if (window.GEV) window.GEV.soundPlayOk = String((err && err.name) || err);
+          });
+        } else if (window.GEV) {
+          window.GEV.soundPlayOk = true;
+        }
+      } catch (err) {
+        if (window.GEV) window.GEV.soundPlayOk = String((err && err.name) || err);
+      }
+    }
+    function initAudio() {
+      sfx.win = document.getElementById("sfxWin");
+      sfx.lose = document.getElementById("sfxLose");
+      sfx.iphone = document.getElementById("sfxIphone");
+      applyMuteUI();
+      var btn = document.getElementById("muteBtn");
+      if (btn) {
+        btn.addEventListener("click", function () {
+          unlockAudio();
+          setMuted(!audioMuted);
+        });
+      }
+      var unlockOnce = function () { unlockAudio(); };
+      document.addEventListener("pointerdown", unlockOnce, { capture: true });
+      document.addEventListener("touchstart", unlockOnce, { capture: true, passive: true });
+      document.addEventListener("keydown", unlockOnce, { capture: true });
+    }
+    initAudio();
+
 
     /* ---------- UI branding ---------- */
     applyColors(CONFIG.colors);
@@ -1000,11 +1194,13 @@
     }
     renderPrizeUnder();
 
-    function showResult() {
+    function showResult(opts) {
+      opts = opts || {};
       document.body.classList.remove("is-scratching-phase");
       document.body.classList.add("is-revealed");
       if (prize.isJackpot) document.body.classList.add("is-jackpot");
       if (isNoWin(prize)) document.body.classList.add("is-nowin");
+      if (isIphonePrize(prize)) document.body.classList.add("is-iphone-jackpot");
       var block = document.getElementById("resultBlock");
       block.hidden = false;
       document.getElementById("resultIco").innerHTML = iconSvg(prize.icon || prize.id);
@@ -1021,7 +1217,9 @@
       document.getElementById("redeemText").textContent = noWin ? "" : (CONFIG.redeemText || "");
       document.getElementById("validityText").textContent = noWin ? "" :
         (prize.isJackpot ? (CONFIG.jackpotText || CONFIG.validityText || "") : (CONFIG.validityText || ""));
-      if (prize.isJackpot) startConfetti();
+      if (isIphonePrize(prize)) startIphoneCelebration();
+      else if (prize.isJackpot) startConfetti();
+      if (opts.playSound) playResultSound();
     }
 
     /* ---------- Scratch canvas ---------- */
@@ -1188,13 +1386,14 @@
       (claimPromise || startClaim()).then(function (ok) {
         if (!ok) return;
         state.revealed = true;
-        autoReveal(showResult);
+        autoReveal(function () { showResult({ playSound: true }); });
       });
     }
 
     function onStart(e) {
       if (revealed) return;
       e.preventDefault();
+      unlockAudio();
       startClaim();
       scratching = true;
       document.body.classList.add("is-scratch-started");
@@ -1277,6 +1476,101 @@
       confettiTimer = requestAnimationFrame(tick);
     }
 
+    function startIphoneCelebration() {
+      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      var c = document.getElementById("confetti");
+      var cx = c.getContext("2d");
+      function size() {
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+      }
+      size();
+      var golds = ["#C9A227", "#F3D58A", "#FEF8EC", "#FCF5E5", "#8C6418", "#FFF8E0", "#E6C766", "#4A2C14"];
+      var bits = [];
+      var sparks = [];
+      function spawnBurst(x, y, n, speed) {
+        for (var i = 0; i < n; i++) {
+          var ang = (Math.PI * 2 * i) / n + Math.random() * 0.45;
+          var sp = (speed || 4) * (0.45 + Math.random() * 0.85);
+          sparks.push({
+            x: x, y: y,
+            vx: Math.cos(ang) * sp,
+            vy: Math.sin(ang) * sp,
+            life: 1,
+            decay: 0.012 + Math.random() * 0.01,
+            r: 1.4 + Math.random() * 2.2,
+            color: golds[i % golds.length]
+          });
+        }
+      }
+      for (var i = 0; i < 140; i++) {
+        bits.push({
+          x: Math.random() * c.width,
+          y: -20 - Math.random() * c.height,
+          w: 5 + Math.random() * 8,
+          h: 7 + Math.random() * 12,
+          vx: -1.6 + Math.random() * 3.2,
+          vy: 2.2 + Math.random() * 3.6,
+          rot: Math.random() * Math.PI,
+          vr: -0.16 + Math.random() * 0.32,
+          color: golds[i % golds.length]
+        });
+      }
+      spawnBurst(c.width * 0.5, c.height * 0.32, 52, 6.8);
+      spawnBurst(c.width * 0.22, c.height * 0.42, 34, 5.2);
+      spawnBurst(c.width * 0.78, c.height * 0.42, 34, 5.2);
+      var start = Date.now();
+      var nextBurst = 350;
+      function tick() {
+        cx.clearRect(0, 0, c.width, c.height);
+        var elapsed = Date.now() - start;
+        if (elapsed > nextBurst && elapsed < 5200) {
+          spawnBurst(
+            c.width * (0.18 + Math.random() * 0.64),
+            c.height * (0.18 + Math.random() * 0.4),
+            28 + Math.floor(Math.random() * 16),
+            5 + Math.random() * 2.5
+          );
+          nextBurst += 420 + Math.random() * 280;
+        }
+        bits.forEach(function (b) {
+          b.x += b.vx;
+          b.y += b.vy;
+          b.rot += b.vr;
+          if (b.y > c.height + 20) {
+            b.y = -20;
+            b.x = Math.random() * c.width;
+          }
+          cx.save();
+          cx.translate(b.x, b.y);
+          cx.rotate(b.rot);
+          cx.fillStyle = b.color;
+          cx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
+          cx.restore();
+        });
+        for (var s = sparks.length - 1; s >= 0; s--) {
+          var p = sparks[s];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.06;
+          p.vx *= 0.99;
+          p.life -= p.decay;
+          if (p.life <= 0) { sparks.splice(s, 1); continue; }
+          cx.beginPath();
+          cx.globalAlpha = Math.max(0, p.life);
+          cx.fillStyle = p.color;
+          cx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          cx.fill();
+          cx.globalAlpha = 1;
+        }
+        if (elapsed < 7000) confettiTimer = requestAnimationFrame(tick);
+        else cx.clearRect(0, 0, c.width, c.height);
+      }
+      if (confettiTimer) cancelAnimationFrame(confettiTimer);
+      confettiTimer = requestAnimationFrame(tick);
+    }
+
+
     /* ---------- Boot ---------- */
     window.GEV = {
       CONFIG: CONFIG,
@@ -1285,7 +1579,13 @@
       device: DEVICE,
       reveal: finishReveal,
       scratchedPercent: scratchedPercent,
-      formatCodeDisplay: formatCodeDisplay
+      formatCodeDisplay: formatCodeDisplay,
+      unlockAudio: unlockAudio,
+      playResultSound: playResultSound,
+      setMuted: setMuted,
+      isIphonePrize: isIphonePrize,
+      lastSound: lastSound,
+      audioUnlocked: audioUnlocked
     };
 
     function startScratch() {
